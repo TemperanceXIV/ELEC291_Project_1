@@ -25,6 +25,8 @@ OnOff: ds 1
 Player1Counter: ds 4
 Player2Counter: ds 4
 CurrentFreq: ds 1
+bob: ds 2
+Once: ds 2
 
 bseg
 mf: dbit 1
@@ -68,6 +70,8 @@ Initial_Message1:  db 'Period A:       ', 0
 Initial_Message2:  db 'Period B:       ', 0
 EndMessage1: db 'Player 1 Wins!', 0
 EndMessage2: db 'Player 2 Wins!', 0
+BlankSpace: db '00', 0
+BlankROw: db '0000000000000000'
 
 
 
@@ -195,8 +199,15 @@ DisplayBCD_LCD:
     
     ret
     
+
+    
 Timer0_Init:
-	lcall Wait1s
+	
+	lcall Wait_Random
+	lcall Wait_Random
+	lcall Wait_Random
+	lcall Wait_Random
+	lcall Wait_Random
 	mov a, TMOD
 	anl a, #0xf0 ; Clear the bits for timer 0
 	orl a, #0x01 ; Configure timer 0 as 16-timer
@@ -214,6 +225,7 @@ Timer0_Init:
 	mov RH0, #high(TIMER0_RELOAD1)
 	mov RL0, #low(TIMER0_RELOAD1)
 	mov CurrentFreq, #0x01
+
 	sjmp Donne
 LowFreq:
 	mov TH0, #high(TIMER0_RELOAD2)
@@ -222,6 +234,7 @@ LowFreq:
 	mov RH0, #high(TIMER0_RELOAD2)
 	mov RL0, #low(TIMER0_RELOAD2)
 	mov CurrentFreq, #0x00
+
 Donne:
 	
 	; Enable the timer and interrupts
@@ -244,6 +257,8 @@ Timer0_ISR:
 ;---------------------------------;
 Initialize_All:
 	jb p4.5, $
+	
+	mov Once, #0x69
     lcall InitTimer2
     lcall Timer0_Init
     lcall LCD_4BIT ; Initialize LCD
@@ -254,6 +269,7 @@ Initialize_All:
     mov Player1Counter, #0x00
     mov Player2Counter, #0x00
     mov CurrentFreq, #0x00
+   
 	ret
 
 ;---------------------------------;
@@ -273,17 +289,18 @@ MyProgram:
     
 forever:
     ; Measure the period applied to pin P2.0
-lcall Wait_Random
-    lcall Timer0_Init
 
-    mov a, OnOff
-    cjne a, #0x00, Next
-    cpl TR0
-    inc OnOff
-    sjmp NextTwo
-Next:
-	dec OnOff
-NextTwo:
+
+;   lcall Timer0_Init
+	mov a, Player1Counter
+	cjne a, #0x04, NoWinner1
+	ljmp GameOver
+NoWinner1:
+	mov a, Player2Counter
+	cjne a, #0x04, NoWinner2
+	ljmp GameOver
+NoWinner2:
+    clr a
     clr TR2 ; Stop counter 2
     mov TL2, #0
     mov TH2, #0
@@ -295,6 +312,7 @@ NextTwo:
 meas_loop1:
  	jb P1.0, $
     jnb P1.0, $
+
     djnz R0, meas_loop1 ; Measure the time of 100 periods
     clr TR2 ; Stop counter 2, TH2-TL2 has the period
     ; save the period of P2.0 for later use
@@ -308,28 +326,36 @@ meas_loop1:
     lcall DisplayBCD_LCD
    
     
+  ;  mov a, Period_A
     mov a, Period_A+1
-    add a, #1
-    da a 
-    mov b, #10
+    
+	mov b, #2
 	div ab
-	add a, #1 
+	add a, #3
 	da a
-    Set_Cursor(1, 3)
+    Set_Cursor(1, 5)
     Display_BCD(a)
-    cjne a, #0x9, LA
+    cjne a, #0x29, LA
     mov a, CurrentFreq
     cjne a, #0x00, LB
     inc Player1Counter
-    Set_Cursor(1, 3)
+    Set_Cursor(1, 1)
     Display_BCD(Player1Counter)
+    cpl TR0
+    lcall Timer0_Init
     sjmp LA   
 LB:
 	mov a, Player1Counter
 	cjne a, #0x00, LC
+	cpl TR0
+	lcall Timer0_Init
 	sjmp LA
 LC:
 	dec Player1Counter
+	Set_Cursor(1, 1)
+    Display_BCD(Player1Counter)
+	cpl TR0
+	lcall Timer0_Init
 LA:
     
     ; Measure the period applied to pin P2.1
@@ -357,37 +383,74 @@ meas_loop2:
 	lcall hex2bcd3
     lcall DisplayBCD_LCD
     
-    mov a, Period_B
-    cjne a, #0x78, LD
+    mov a, Period_B+1
+    
+	mov b, #2
+	div ab
+	add a, #10
+	da a
+    Set_Cursor(2, 5)
+    Display_BCD(a)
+
+    cjne a, #0x37, LD
     mov a, CurrentFreq
     cjne a, #0x00, LG
     inc Player2Counter
+    Set_Cursor(2, 1)
+    Display_BCD(Player2Counter)
+    cpl TR0
+    lcall Timer0_Init
     sjmp LD  
 LG:
 	mov a, Player2Counter
 	cjne a, #0x00, LF
+	cpl TR0
+	lcall Timer0_Init
 	sjmp LD
 LF:
 	dec Player2Counter
+	Set_Cursor(2, 1)
+    Display_BCD(Player2Counter)
+	cpl TR0
+	lcall Timer0_Init
 LD:
     
     Set_Cursor(1, 1)
     Display_BCD(Player1Counter)
 	Set_Cursor(2, 1)
     Display_BCD(Player2Counter)
-    
+
+;    mov a, OnOff
+;    cjne a, #0x00, Next
+ ;   cpl TR0
+ ;   inc OnOff
+;    sjmp NextTwo
+Next:
+;	dec OnOff
+NextTwo:
     ljmp forever ; Repeat! 
 
 GameOver:
     cpl TR0
 	mov a, Player1Counter
-	cjne a, #0x10, Player2Wins
+	cjne a, #0x4, Player2Wins
+	
+	Set_Cursor(1, 15)
+	Send_Constant_String(#BlankSpace)
+	Set_Cursor(2, 1)
+	Send_Constant_String(#BlankRow)
 	Set_Cursor(1, 1)
 	Send_Constant_String(#EndMessage1)
 	sjmp DeadEnd
 Player2Wins:
+	
+	Set_Cursor(1, 15)
+	Send_Constant_String(#BlankSpace)
+	Set_Cursor(2, 1)
+	Send_Constant_String(#BlankRow)
 	Set_Cursor(1, 1)
 	Send_Constant_String(#EndMessage2)
+	
 DeadEnd:
     
     
