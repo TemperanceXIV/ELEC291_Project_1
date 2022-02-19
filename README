@@ -12,7 +12,7 @@ Extra Functionality:
   - Song name is Twinkle Twinkle Little Star (6 different note frequencies)
 3) Changed game rules around:
   - When high note plays, player wants to press capacitor in order to gain point
-  - When low note plays, player wants to sabotoge other players' capacitor to make them lose point
+  - When low note plays, player wants to sabotage other players' capacitor to make them lose point
   - Game continues until any player hits 4 points
 4) High sensitivity
   - Able to detect changes with one finger on one side of the capacitor
