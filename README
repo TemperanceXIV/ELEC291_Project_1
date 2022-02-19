@@ -7,12 +7,12 @@ Tenna Yuan (15253966)
 Kevin Chen (14480321)
 
 Extra Functionality:
-- Now a 3 player game (added one more capacitor)
-- Added Victory Song at the end with 2 different speeds
+1) Now a 3 player game (added one more capacitor)
+2) Added Victory Song at the end with 2 different speeds
   - Song name is Twinkle Twinkle Little Star (6 different note frequencies)
-- Changed game rules around:
+3) Changed game rules around:
   - When high note plays, player wants to press capacitor in order to gain point
   - When low note plays, player wants to sabotoge other players' capacitor to make them lose point
   - Game continues until any player hits 4 points
-- High sensitivity
+4) High sensitivity
   - Able to detect changes with one finger on one side of the capacitor
