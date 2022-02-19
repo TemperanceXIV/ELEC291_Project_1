@@ -5,12 +5,12 @@ $LIST
 CLK           EQU 22118400 ; Microcontroller system crystal frequency in Hz
 TIMER0_RATE0  EQU ((2048*2)+100)
 TIMER0_RATE1  EQU ((2048*2)-100)
-TIMER0_RATEA EQU 440*2
-TIMER0_RATEE EQU 660*2
-TIMER0_RATEFS EQU 740*2
-TIMER0_RATED EQU 587*2
-TIMER0_RATECS EQU 554*2
-TIMER0_RATEB EQU 494*2
+TIMER0_RATEA EQU 1580*2
+TIMER0_RATEE EQU 2350*2
+TIMER0_RATEFS EQU 2600*2
+TIMER0_RATED EQU 2100*2
+TIMER0_RATECS EQU 2000*2
+TIMER0_RATEB EQU 1780*2
 
 TIMER0_RELOAD0 EQU ((65536-(CLK/TIMER0_RATE0)))
 TIMER0_RELOAD1 EQU ((65536-(CLK/TIMER0_RATE1)))
@@ -91,21 +91,33 @@ forever:
 	
 	lcall WaitHalfSec
 	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
 	mov RH0, #high(TIMER0_RELOADA)
 	mov RL0, #low(TIMER0_RELOADA)
 	setb TR0
 	
 	lcall WaitHalfSec
 	clr TR0
-	mov RH0, #high(TIMER0_RELOADE)
-	mov RL0, #low(TIMER0_RELOADE)
-	setb TR0
 	
 	lcall WaitHalfSec
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADE)
 	mov RL0, #low(TIMER0_RELOADE)
 	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADE)
+	mov RL0, #low(TIMER0_RELOADE)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
 	
 	lcall WaitHalfSec
 	clr TR0
@@ -115,15 +127,25 @@ forever:
 	
 	lcall WaitHalfSec
 	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
 	mov RH0, #high(TIMER0_RELOADFS)
 	mov RL0, #low(TIMER0_RELOADFS)
 	setb TR0
 	
 	lcall WaitHalfSec
 	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
 	mov RH0, #high(TIMER0_RELOADE)
 	mov RL0, #low(TIMER0_RELOADE)
 	setb TR0
+	lcall WaitHalfSec
+	
+	lcall WaitHalfSec
+	clr TR0
 	
 	lcall WaitHalfSec
 	clr TR0
@@ -133,15 +155,15 @@ forever:
 	
 	lcall WaitHalfSec
 	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
 	mov RH0, #high(TIMER0_RELOADD)
 	mov RL0, #low(TIMER0_RELOADD)
 	setb TR0
 	
 	lcall WaitHalfSec
 	clr TR0
-	mov RH0, #high(TIMER0_RELOADCS)
-	mov RL0, #low(TIMER0_RELOADCS)
-	setb TR0
 	
 	lcall WaitHalfSec
 	clr TR0
@@ -151,21 +173,43 @@ forever:
 	
 	lcall WaitHalfSec
 	clr TR0
-	mov RH0, #high(TIMER0_RELOADB)
-	mov RL0, #low(TIMER0_RELOADB)
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADCS)
+	mov RL0, #low(TIMER0_RELOADCS)
 	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
 	
 	lcall WaitHalfSec
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADB)
 	mov RL0, #low(TIMER0_RELOADB)
 	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADB)
+	mov RL0, #low(TIMER0_RELOADB)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
 	
 	lcall WaitHalfSec
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADA)
 	mov RL0, #low(TIMER0_RELOADA)
 	setb TR0
+	lcall WaitHalfSec
+	
+	lcall WaitHalfSec
+	clr TR0
 	
     ljmp forever ; Repeat! 
 

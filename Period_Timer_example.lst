@@ -1,0 +1,243 @@
+                  2   $LIST
+0000              4   
+0000              5   org 0000H
+0000 020170       6      ljmp MyProgram
+0003              7   
+0003              8   ; Timer/Counter 2 overflow interrupt vector
+002B              9   org 0x002B
+002B 0200FC      10            ljmp Timer2_ISR
+002E             11   
+002E             12   cseg
+002E             13   ; These 'equ' must match the hardware wiring
+002E             14   LCD_RS equ P3.2
+002E             15   ;LCD_RW equ PX.X ; Not used in this code, connect the pin to GND
+002E             16   LCD_E  equ P3.3
+002E             17   LCD_D4 equ P3.4
+002E             18   LCD_D5 equ P3.5
+002E             19   LCD_D6 equ P3.6
+002E             20   LCD_D7 equ P3.7
+002E             21   
+                 23   	$LIST
+00DA             25   
+0030             26   DSEG at 0x30
+0030             27   Period_A: ds 3
+0033             28   Period_B: ds 3
+0036             29   T2ov:     ds 1
+0037             30   
+00DA             31   CSEG
+00DA             32   ;                      1234567890123456    <- This helps determine the location of the counter
+00DA 50657269    33   Initial_Message1:  db 'Period A:       ', 0
+     6F642041
+     3A202020
+     20202020
+     00
+00EB 50657269    34   Initial_Message2:  db 'Period B:       ', 0
+     6F642042
+     3A202020
+     20202020
+     00
+00FC             35   
+00FC             36   ;---------------------------------;
+00FC             37   ; ISR for timer 2                 ;
+00FC             38   ;---------------------------------;
+00FC             39   Timer2_ISR:
+00FC C2CF        40            clr TF2  ; Timer 2 doesn't clear TF2 automatically. Do it in ISR.
+00FE 0536        41            inc T2ov
+0100 32          42            reti
+0101             43   
+0101             44   ; When using a 22.1184MHz crystal in fast mode
+0101             45   ; one cycle takes 1.0/22.1184MHz = 45.21123 ns
+0101             46   ; (tuned manually to get as close to 1s as possible)
+0101             47   Wait1s:
+0101 7AB0        48       mov R2, #176
+0103 79FA        49   X3: mov R1, #250
+0105 78A6        50   X2: mov R0, #166
+0107 D8FE        51   X1: djnz R0, X1 ; 3 cycles->3*45.21123ns*166=22.51519us
+0109 D9FA        52       djnz R1, X2 ; 22.51519us*250=5.629ms
+010B DAF6        53       djnz R2, X3 ; 5.629ms*176=1.0s (approximately)
+010D 22          54       ret
+010E             55   
+010E             56   ;Initializes timer/counter 2 as a 16-bit timer
+010E             57   InitTimer2:
+010E 75C800      58            mov T2CON, #0b_0000_0000 ; Stop timer/counter.  Set as timer (clock input is pin 22.1184MHz).
+0111             59            ; Set the reload value on overflow to zero (just in case is not zero)
+0111 75CB00      60            mov RCAP2H, #0
+0114 75CA00      61            mov RCAP2L, #0
+0117 D2AD        62            setb ET2  ; Enable timer 2 interrupt to count overflow
+0119 22          63       ret
+011A             64   
+011A             65   ;Converts the hex number in T2ov-TH2 to BCD in R2-R1-R0
+011A             66   hex2bcd2:
+011A E4          67            clr a
+011B 7800        68       mov R0, #0  ;Set BCD result to 00000000 
+011D 7900        69       mov R1, #0
+011F 7A00        70       mov R2, #0
+0121 7B10        71       mov R3, #16 ;Loop counter.
+0123             72   
+0123             73   hex2bcd_loop:
+0123 E5CD        74       mov a, TH2 ;Shift T2ov-TH2 left through carry
+0125 33          75       rlc a
+0126 F5CD        76       mov TH2, a
+0128             77       
+0128 E536        78       mov a, T2ov
+012A 33          79       rlc a
+012B F536        80       mov T2ov, a
+012D             81         
+012D             82            ; Perform bcd + bcd + carry
+012D             83            ; using BCD numbers
+012D E8          84            mov a, R0
+012E 38          85            addc a, R0
+012F D4          86            da a
+0130 F8          87            mov R0, a
+0131             88            
+0131 E9          89            mov a, R1
+0132 39          90            addc a, R1
+0133 D4          91            da a
+0134 F9          92            mov R1, a
+0135             93            
+0135 EA          94            mov a, R2
+0136 3A          95            addc a, R2
+0137 D4          96            da a
+0138 FA          97            mov R2, a
+0139             98            
+0139 DBE8        99            djnz R3, hex2bcd_loop
+013B 22         100            ret
+013C            101   
+013C            102   ; Dumps the 5-digit packed BCD number in R2-R1-R0 into the LCD
+013C            103   DisplayBCD_LCD:
+013C            104            ; 5th digit:
+013C EA         105       mov a, R2
+013D 540F       106       anl a, #0FH
+013F 4430       107       orl a, #'0' ; convert to ASCII
+0141 12007E     108            lcall ?WriteData
+0144            109            ; 4th digit:
+0144 E9         110       mov a, R1
+0145 C4         111       swap a
+0146 540F       112       anl a, #0FH
+0148 4430       113       orl a, #'0' ; convert to ASCII
+014A 12007E     114            lcall ?WriteData
+014D            115            ; 3rd digit:
+014D E9         116       mov a, R1
+014E 540F       117       anl a, #0FH
+0150 4430       118       orl a, #'0' ; convert to ASCII
+0152 12007E     119            lcall ?WriteData
+0155            120            ; 2nd digit:
+0155 E8         121       mov a, R0
+0156 C4         122       swap a
+0157 540F       123       anl a, #0FH
+0159 4430       124       orl a, #'0' ; convert to ASCII
+015B 12007E     125            lcall ?WriteData
+015E            126            ; 1st digit:
+015E E8         127       mov a, R0
+015F 540F       128       anl a, #0FH
+0161 4430       129       orl a, #'0' ; convert to ASCII
+0163 12007E     130            lcall ?WriteData
+0166            131       
+0166 22         132       ret
+0167            133   
+0167            134   ;---------------------------------;
+0167            135   ; Hardware initialization         ;
+0167            136   ;---------------------------------;
+0167            137   Initialize_All:
+0167 12010E     138       lcall InitTimer2
+016A 120088     139       lcall LCD_4BIT ; Initialize LCD
+016D D2AF       140       setb EA ; enable interrupts
+016F 22         141            ret
+0170            142   
+0170            143   ;---------------------------------;
+0170            144   ; Main program loop               ;
+0170            145   ;---------------------------------;
+0170            146   MyProgram:
+0170            147       ; Initialize the hardware:
+0170 75817F     148       mov SP, #7FH
+0173 120167     149       lcall Initialize_All
+0176            150       ; Make sure the two input pins are configure for input
+0176 D2A0       151       setb P2.0 ; Pin is used as input
+0178 D2A1       152       setb P2.1 ; Pin is used as input
+017A            153   
+017A C0E0       154            push acc
+017C 7401       154            mov a, #1
+017E 14         154            dec a
+017F 1200BF     154            lcall ?Set_Cursor_1 ; Select column and row
+0182 D0E0       154            pop acc
+0184 C083       155            push dph
+0186 C082       155            push dpl
+0188 C0E0       155            push acc
+018A 9000DA     155            mov dptr, #Initial_Message1
+018D 1200B2     155            lcall ?Send_Constant_String
+0190 D0E0       155            pop acc
+0192 D082       155            pop dpl
+0194 D083       155            pop dph
+0196 C0E0       156            push acc
+0198 7401       156            mov a, #1
+019A 14         156            dec a
+019B 1200BD     156            lcall ?Set_Cursor_2 ; Select column and row
+019E D0E0       156            pop acc
+01A0 C083       157            push dph
+01A2 C082       157            push dpl
+01A4 C0E0       157            push acc
+01A6 9000EB     157            mov dptr, #Initial_Message2
+01A9 1200B2     157            lcall ?Send_Constant_String
+01AC D0E0       157            pop acc
+01AE D082       157            pop dpl
+01B0 D083       157            pop dph
+01B2            158       
+01B2            159   forever:
+01B2            160       ; Measure the period applied to pin P2.0
+01B2 C2CA       161       clr TR2 ; Stop counter 2
+01B4 75CC00     162       mov TL2, #0
+01B7 75CD00     163       mov TH2, #0
+01BA 753600     164       mov T2ov, #0
+01BD 20A0FD     165       jb P2.0, $
+01C0 30A0FD     166       jnb P2.0, $
+01C3 7800       167       mov R0, #0 ; 0 means repeat 256 times
+01C5 D2CA       168       setb TR2 ; Start counter 0
+01C7            169   meas_loop1:
+01C7 20A0FD     170       jb P2.0, $
+01CA 30A0FD     171       jnb P2.0, $
+01CD D8F8       172       djnz R0, meas_loop1 ; Measure the time of 100 periods
+01CF C2CA       173       clr TR2 ; Stop counter 2, TH2-TL2 has the period
+01D1            174       ; save the period of P2.0 for later use
+01D1 85CC30     175       mov Period_A+0, TL2
+01D4 85CD31     176       mov Period_A+1, TH2
+01D7 853632     177       mov Period_A+2, T2ov
+01DA            178   
+01DA            179            ; Convert the result to BCD and display on LCD
+01DA C0E0       180            push acc
+01DC 740B       180            mov a, #11
+01DE 14         180            dec a
+01DF 1200BF     180            lcall ?Set_Cursor_1 ; Select column and row
+01E2 D0E0       180            pop acc
+01E4 12011A     181            lcall hex2bcd2
+01E7 12013C     182       lcall DisplayBCD_LCD
+01EA            183       
+01EA            184       ; Measure the period applied to pin P2.1
+01EA C2CA       185       clr TR2 ; Stop counter 2
+01EC 75CC00     186       mov TL2, #0
+01EF 75CD00     187       mov TH2, #0
+01F2 753600     188       mov T2ov, #0
+01F5 20A1FD     189       jb P2.1, $
+01F8 30A1FD     190       jnb P2.1, $
+01FB 7800       191       mov R0, #0 ; 0 means repeat 256 times
+01FD D2CA       192       setb TR2 ; Start counter 0
+01FF            193   meas_loop2:
+01FF 20A1FD     194       jb P2.1, $
+0202 30A1FD     195       jnb P2.1, $
+0205 D8F8       196       djnz R0, meas_loop2 ; Measure the time of 100 periods
+0207 C2CA       197       clr TR2 ; Stop counter 2, TH2-TL2 has the period
+0209            198       ; save the period of P2.1 for later use
+0209 85CC33     199       mov Period_B+0, TL2
+020C 85CD34     200       mov Period_B+1, TH2
+020F 853635     201       mov Period_B+2, T2ov
+0212            202   
+0212            203            ; Convert the result to BCD and display on LCD
+0212 C0E0       204            push acc
+0214 740B       204            mov a, #11
+0216 14         204            dec a
+0217 1200BD     204            lcall ?Set_Cursor_2 ; Select column and row
+021A D0E0       204            pop acc
+021C 12011A     205            lcall hex2bcd2
+021F 12013C     206       lcall DisplayBCD_LCD
+0222            207       
+0222 808E       208       sjmp forever ; Repeat! 
+0224            209   en

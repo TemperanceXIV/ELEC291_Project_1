@@ -1,0 +1,214 @@
+                  2   $LIST
+0000              4   
+0000              5   CLK           EQU 22118400 ; Microcontroller system crystal frequency in Hz
+0000              6   TIMER0_RATE0  EQU ((2048*2)+100)
+0000              7   TIMER0_RATE1  EQU ((2048*2)-100)
+0000              8   TIMER0_RATEA EQU 1580*2
+0000              9   TIMER0_RATEE EQU 2350*2
+0000             10   TIMER0_RATEFS EQU 2600*2
+0000             11   TIMER0_RATED EQU 2100*2
+0000             12   TIMER0_RATECS EQU 2000*2
+0000             13   TIMER0_RATEB EQU 1780*2
+0000             14   
+0000             15   TIMER0_RELOAD0 EQU ((65536-(CLK/TIMER0_RATE0)))
+0000             16   TIMER0_RELOAD1 EQU ((65536-(CLK/TIMER0_RATE1)))
+0000             17   TIMER0_RELOADA EQU ((65536-(CLK/TIMER0_RATEA)))
+0000             18   TIMER0_RELOADE EQU ((65536-(CLK/TIMER0_RATEE)))
+0000             19   TIMER0_RELOADFS EQU ((65536-(CLK/TIMER0_RATEFS)))
+0000             20   TIMER0_RELOADD EQU ((65536-(CLK/TIMER0_RATED)))
+0000             21   TIMER0_RELOADCS EQU ((65536-(CLK/TIMER0_RATECS)))
+0000             22   TIMER0_RELOADB EQU ((65536-(CLK/TIMER0_RATEB)))
+0000             23   
+0000             24   SOUND_OUT EQU P1.1
+0000             25   
+0000             26   org 0000H
+0000 020037      27      ljmp Startup
+0003             28   
+0003             29   ; Timer/Counter 0 overflow interrupt vector
+000B             30   org 0x000B
+000B 020027      31            ljmp Timer0_ISR
+000E             32   
+000E             33   ;---------------------------------;
+000E             34   ; Routine to initialize the ISR   ;
+000E             35   ; for timer 0                     ;
+000E             36   ;---------------------------------;
+000E             37   InitTimer0:
+000E E589        38            mov a, TMOD
+0010 54F0        39            anl a, #0xf0 ; 11110000 Clear the bits for timer 0
+0012 4401        40            orl a, #0x01 ; 00000001 Configure timer 0 as 16-timer
+0014 F589        41            mov TMOD, a
+0016 758CEA      42            mov TH0, #high(TIMER0_RELOAD1)
+0019 758A61      43            mov TL0, #low(TIMER0_RELOAD1)
+001C             44            ; Set autoreload value
+001C 75F4EA      45            mov RH0, #high(TIMER0_RELOAD1)
+001F 75F261      46            mov RL0, #low(TIMER0_RELOAD1)
+0022             47            ; Enable the timer and interrupts
+0022 D2A9        48       setb ET0  ; Enable timer 0 interrupt
+0024 D28C        49       setb TR0  ; Start timer 0
+0026 22          50            ret
+0027             51   
+0027             52   ;---------------------------------;
+0027             53   ; ISR for timer 0.  Set to execute;
+0027             54   ; every 1/4096Hz to generate a    ;
+0027             55   ; 2048 Hz square wave at pin P1.1 ;
+0027             56   ;---------------------------------;
+0027             57   Timer0_ISR:
+0027 B291        58            cpl SOUND_OUT ; Connect speaker to P1.1!
+0029 32          59            reti
+002A             60   
+002A             61   ; When using a 22.1184MHz crystal in fast mode
+002A             62   ; one cycle takes 1.0/22.1184MHz = 45.21123 ns
+002A             63   WaitHalfSec:
+002A 7A59        64       mov R2, #89
+002C 79FA        65   L3: mov R1, #250
+002E 78A6        66   L2: mov R0, #166
+0030 D8FE        67   L1: djnz R0, L1 ; 3 cycles->3*45.21123ns*166=22.51519us
+0032 D9FA        68       djnz R1, L2 ; 22.51519us*250=5.629ms
+0034 DAF6        69       djnz R2, L3 ; 5.629ms*89=0.5s (approximately)
+0036 22          70       ret
+0037             71   
+0037             72   ;---------------------------------;
+0037             73   ; Hardware and variable           ;
+0037             74   ; initialization                  ;
+0037             75   ;---------------------------------;
+0037             76   Startup:
+0037             77       ; Initialize the hardware:
+0037 75817F      78       mov SP, #7FH
+003A 12000E      79       lcall InitTimer0
+003D D2AF        80       setb EA
+003F             81       
+003F             82   ;---------------------------------;
+003F             83   ; Main program loop               ;
+003F             84   ;---------------------------------;  
+003F             85   forever:
+003F 12002A      86            lcall WaitHalfSec
+0042 C28C        87            clr TR0
+0044 75F492      88            mov RH0, #high(TIMER0_RELOADA)
+0047 75F2A4      89            mov RL0, #low(TIMER0_RELOADA)
+004A D28C        90            setb TR0
+004C             91            
+004C 12002A      92            lcall WaitHalfSec
+004F C28C        93            clr TR0
+0051             94            
+0051 12002A      95            lcall WaitHalfSec
+0054 C28C        96            clr TR0
+0056 75F492      97            mov RH0, #high(TIMER0_RELOADA)
+0059 75F2A4      98            mov RL0, #low(TIMER0_RELOADA)
+005C D28C        99            setb TR0
+005E            100            
+005E 12002A     101            lcall WaitHalfSec
+0061 C28C       102            clr TR0
+0063            103            
+0063 12002A     104            lcall WaitHalfSec
+0066 C28C       105            clr TR0
+0068 75F4B6     106            mov RH0, #high(TIMER0_RELOADE)
+006B 75F278     107            mov RL0, #low(TIMER0_RELOADE)
+006E D28C       108            setb TR0
+0070            109            
+0070 12002A     110            lcall WaitHalfSec
+0073 C28C       111            clr TR0
+0075            112            
+0075 12002A     113            lcall WaitHalfSec
+0078 C28C       114            clr TR0
+007A 75F4B6     115            mov RH0, #high(TIMER0_RELOADE)
+007D 75F278     116            mov RL0, #low(TIMER0_RELOADE)
+0080 D28C       117            setb TR0
+0082            118            
+0082 12002A     119            lcall WaitHalfSec
+0085 C28C       120            clr TR0
+0087            121            
+0087 12002A     122            lcall WaitHalfSec
+008A C28C       123            clr TR0
+008C 75F4BD     124            mov RH0, #high(TIMER0_RELOADFS)
+008F 75F28A     125            mov RL0, #low(TIMER0_RELOADFS)
+0092 D28C       126            setb TR0
+0094            127            
+0094 12002A     128            lcall WaitHalfSec
+0097 C28C       129            clr TR0
+0099            130            
+0099 12002A     131            lcall WaitHalfSec
+009C C28C       132            clr TR0
+009E 75F4BD     133            mov RH0, #high(TIMER0_RELOADFS)
+00A1 75F28A     134            mov RL0, #low(TIMER0_RELOADFS)
+00A4 D28C       135            setb TR0
+00A6            136            
+00A6 12002A     137            lcall WaitHalfSec
+00A9 C28C       138            clr TR0
+00AB            139            
+00AB 12002A     140            lcall WaitHalfSec
+00AE C28C       141            clr TR0
+00B0 75F4B6     142            mov RH0, #high(TIMER0_RELOADE)
+00B3 75F278     143            mov RL0, #low(TIMER0_RELOADE)
+00B6 D28C       144            setb TR0
+00B8 12002A     145            lcall WaitHalfSec
+00BB            146            
+00BB 12002A     147            lcall WaitHalfSec
+00BE C28C       148            clr TR0
+00C0            149            
+00C0 12002A     150            lcall WaitHalfSec
+00C3 C28C       151            clr TR0
+00C5 75F4AD     152            mov RH0, #high(TIMER0_RELOADD)
+00C8 75F2B8     153            mov RL0, #low(TIMER0_RELOADD)
+00CB D28C       154            setb TR0
+00CD            155            
+00CD 12002A     156            lcall WaitHalfSec
+00D0 C28C       157            clr TR0
+00D2            158            
+00D2 12002A     159            lcall WaitHalfSec
+00D5 C28C       160            clr TR0
+00D7 75F4AD     161            mov RH0, #high(TIMER0_RELOADD)
+00DA 75F2B8     162            mov RL0, #low(TIMER0_RELOADD)
+00DD D28C       163            setb TR0
+00DF            164            
+00DF 12002A     165            lcall WaitHalfSec
+00E2 C28C       166            clr TR0
+00E4            167            
+00E4 12002A     168            lcall WaitHalfSec
+00E7 C28C       169            clr TR0
+00E9 75F4A9     170            mov RH0, #high(TIMER0_RELOADCS)
+00EC 75F29A     171            mov RL0, #low(TIMER0_RELOADCS)
+00EF D28C       172            setb TR0
+00F1            173            
+00F1 12002A     174            lcall WaitHalfSec
+00F4 C28C       175            clr TR0
+00F6            176            
+00F6 12002A     177            lcall WaitHalfSec
+00F9 C28C       178            clr TR0
+00FB 75F4A9     179            mov RH0, #high(TIMER0_RELOADCS)
+00FE 75F29A     180            mov RL0, #low(TIMER0_RELOADCS)
+0101 D28C       181            setb TR0
+0103            182            
+0103 12002A     183            lcall WaitHalfSec
+0106 C28C       184            clr TR0
+0108            185            
+0108 12002A     186            lcall WaitHalfSec
+010B C28C       187            clr TR0
+010D 75F49E     188            mov RH0, #high(TIMER0_RELOADB)
+0110 75F2EC     189            mov RL0, #low(TIMER0_RELOADB)
+0113 D28C       190            setb TR0
+0115            191            
+0115 12002A     192            lcall WaitHalfSec
+0118 C28C       193            clr TR0
+011A            194            
+011A 12002A     195            lcall WaitHalfSec
+011D C28C       196            clr TR0
+011F 75F49E     197            mov RH0, #high(TIMER0_RELOADB)
+0122 75F2EC     198            mov RL0, #low(TIMER0_RELOADB)
+0125 D28C       199            setb TR0
+0127            200            
+0127 12002A     201            lcall WaitHalfSec
+012A C28C       202            clr TR0
+012C            203            
+012C 12002A     204            lcall WaitHalfSec
+012F C28C       205            clr TR0
+0131 75F492     206            mov RH0, #high(TIMER0_RELOADA)
+0134 75F2A4     207            mov RL0, #low(TIMER0_RELOADA)
+0137 D28C       208            setb TR0
+0139 12002A     209            lcall WaitHalfSec
+013C            210            
+013C 12002A     211            lcall WaitHalfSec
+013F C28C       212            clr TR0
+0141            213            
+0141 02003F     214       ljmp forever ; Repeat! 
+0144            215   
+0144            216   end
