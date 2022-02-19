@@ -2,7 +2,12 @@ ELEC 291 Project 1
 Due FEB 18
 
 Extra Functionality:
-
+- Now a 3 player game (added one more capacitor)
+- Added Victory song at the end with 2 different speeds
+- Changed game rules around:
+  - When high note plays, player wants to press capacitor in order to gain point
+  - When low note plays, player wants to sabatoge other players' capacitor to make them lose point
+  - Game continues until any player hits 4 points
 
 Team Members:
 Braedan Chan
