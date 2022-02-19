@@ -88,8 +88,8 @@ EndMessage3: 		db 'Player 3 Wins!', 0
 PL1: 				db 'P1:', 0
 PL2: 				db 'P2:', 0
 PL3: 				db 'P3:', 0
-BlankSpace: db '00', 0
-BlankROw: db '0000000000000000'
+BlankSpace: 		db '00', 0
+BlankRow: 			db '0000000000000000'
 
 
 
