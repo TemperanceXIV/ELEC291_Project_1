@@ -304,132 +304,132 @@ WaitHalfSec:
 
 ret
 Victory_Song2:
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADA)
 	mov RL0, #low(TIMER0_RELOADA)
 	setb TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADA)
 	mov RL0, #low(TIMER0_RELOADA)
 	setb TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	
-	Wait_Milli_Seconds(#200)
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADE)
-	mov RL0, #low(TIMER0_RELOADE)
-	setb TR0
-	
-	Wait_Milli_Seconds(#200)
-	clr TR0
-	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADE)
 	mov RL0, #low(TIMER0_RELOADE)
 	setb TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADE)
+	mov RL0, #low(TIMER0_RELOADE)
+	setb TR0
+	
+	Wait_Milli_Seconds(#50)
+	clr TR0
+	
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADFS)
 	mov RL0, #low(TIMER0_RELOADFS)
 	setb TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADFS)
 	mov RL0, #low(TIMER0_RELOADFS)
 	setb TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADE)
 	mov RL0, #low(TIMER0_RELOADE)
 	setb TR0
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	
-	Wait_Milli_Seconds(#200)
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADD)
-	mov RL0, #low(TIMER0_RELOADD)
-	setb TR0
-	
-	Wait_Milli_Seconds(#200)
-	clr TR0
-	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADD)
 	mov RL0, #low(TIMER0_RELOADD)
 	setb TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADD)
+	mov RL0, #low(TIMER0_RELOADD)
+	setb TR0
+	
+	Wait_Milli_Seconds(#50)
+	clr TR0
+	
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADCS)
 	mov RL0, #low(TIMER0_RELOADCS)
 	setb TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADCS)
 	mov RL0, #low(TIMER0_RELOADCS)
 	setb TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	
-	Wait_Milli_Seconds(#200)
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADB)
-	mov RL0, #low(TIMER0_RELOADB)
-	setb TR0
-	
-	Wait_Milli_Seconds(#200)
-	clr TR0
-	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADB)
 	mov RL0, #low(TIMER0_RELOADB)
 	setb TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADB)
+	mov RL0, #low(TIMER0_RELOADB)
+	setb TR0
+	
+	Wait_Milli_Seconds(#50)
+	clr TR0
+	
+	Wait_Milli_Seconds(#50)
 	clr TR0
 	mov RH0, #high(TIMER0_RELOADA)
 	mov RL0, #low(TIMER0_RELOADA)
 	setb TR0
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	
-	Wait_Milli_Seconds(#200)
+	Wait_Milli_Seconds(#50)
 	clr TR0
 
 ret
@@ -595,11 +595,11 @@ forever:
 NoWinner1:
 	mov a, Player2Counter
 	cjne a, #0x04, NoWinner2
-	ljmp GameOver
+	ljmp Player2Wins
 NoWinner2:
 	mov a, Player3Counter
 	cjne a, #0x04, NoWinner3
-	ljmp GameOver
+	ljmp Player3Wins
 NoWinner3:
 	mov a, Player4Counter
 	cjne a, #0x04, NoWinner4
@@ -855,7 +855,7 @@ NextTwo:
 GameOver:
     cpl TR0
 	mov a, Player1Counter
-	cjne a, #0x4, Player2Wins
+	;cjne a, #0x04, Player2Wins
 	
 	Set_Cursor(1, 15)
 	Send_Constant_String(#BlankSpace)
@@ -866,14 +866,16 @@ GameOver:
 	ljmp DeadEnd
 Player2Wins:
 	
-	mov a, Player3Counter
-	cjne a, #0x04, Player3Wins
+	mov a, Player2Counter
+	;cjne a, #0x04, Player3Wins
 	Set_Cursor(1, 15)
 	Send_Constant_String(#BlankSpace)
 	Set_Cursor(2, 1)
 	Send_Constant_String(#BlankRow)
 	Set_Cursor(1, 1)
 	Send_Constant_String(#EndMessage2)
+	ljmp DeadEnd
+	
 Player3Wins:
 	Set_Cursor(1, 15)
 	Send_Constant_String(#BlankSpace)

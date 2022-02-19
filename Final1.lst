@@ -385,7 +385,7 @@
 059C 22         305   ret
 059D            306   Victory_Song2:
 059D C002       307            push AR2
-059F 7AC8       307            mov R2, #200
+059F 7A32       307            mov R2, #50
 05A1 120039     307            lcall ?Wait_Milli_Seconds
 05A4 D002       307            pop AR2
 05A6 C28C       308            clr TR0
@@ -394,13 +394,13 @@
 05AE D28C       311            setb TR0
 05B0            312            
 05B0 C002       313            push AR2
-05B2 7AC8       313            mov R2, #200
+05B2 7A32       313            mov R2, #50
 05B4 120039     313            lcall ?Wait_Milli_Seconds
 05B7 D002       313            pop AR2
 05B9 C28C       314            clr TR0
 05BB            315            
 05BB C002       316            push AR2
-05BD 7AC8       316            mov R2, #200
+05BD 7A32       316            mov R2, #50
 05BF 120039     316            lcall ?Wait_Milli_Seconds
 05C2 D002       316            pop AR2
 05C4 C28C       317            clr TR0
@@ -409,13 +409,13 @@
 05CC D28C       320            setb TR0
 05CE            321            
 05CE C002       322            push AR2
-05D0 7AC8       322            mov R2, #200
+05D0 7A32       322            mov R2, #50
 05D2 120039     322            lcall ?Wait_Milli_Seconds
 05D5 D002       322            pop AR2
 05D7 C28C       323            clr TR0
 05D9            324            
 05D9 C002       325            push AR2
-05DB 7AC8       325            mov R2, #200
+05DB 7A32       325            mov R2, #50
 05DD 120039     325            lcall ?Wait_Milli_Seconds
 05E0 D002       325            pop AR2
 05E2 C28C       326            clr TR0
@@ -424,13 +424,13 @@
 05EA D28C       329            setb TR0
 05EC            330            
 05EC C002       331            push AR2
-05EE 7AC8       331            mov R2, #200
+05EE 7A32       331            mov R2, #50
 05F0 120039     331            lcall ?Wait_Milli_Seconds
 05F3 D002       331            pop AR2
 05F5 C28C       332            clr TR0
 05F7            333            
 05F7 C002       334            push AR2
-05F9 7AC8       334            mov R2, #200
+05F9 7A32       334            mov R2, #50
 05FB 120039     334            lcall ?Wait_Milli_Seconds
 05FE D002       334            pop AR2
 0600 C28C       335            clr TR0
@@ -439,13 +439,13 @@
 0608 D28C       338            setb TR0
 060A            339            
 060A C002       340            push AR2
-060C 7AC8       340            mov R2, #200
+060C 7A32       340            mov R2, #50
 060E 120039     340            lcall ?Wait_Milli_Seconds
 0611 D002       340            pop AR2
 0613 C28C       341            clr TR0
 0615            342            
 0615 C002       343            push AR2
-0617 7AC8       343            mov R2, #200
+0617 7A32       343            mov R2, #50
 0619 120039     343            lcall ?Wait_Milli_Seconds
 061C D002       343            pop AR2
 061E C28C       344            clr TR0
@@ -454,13 +454,13 @@
 0626 D28C       347            setb TR0
 0628            348            
 0628 C002       349            push AR2
-062A 7AC8       349            mov R2, #200
+062A 7A32       349            mov R2, #50
 062C 120039     349            lcall ?Wait_Milli_Seconds
 062F D002       349            pop AR2
 0631 C28C       350            clr TR0
 0633            351            
 0633 C002       352            push AR2
-0635 7AC8       352            mov R2, #200
+0635 7A32       352            mov R2, #50
 0637 120039     352            lcall ?Wait_Milli_Seconds
 063A D002       352            pop AR2
 063C C28C       353            clr TR0
@@ -469,13 +469,13 @@
 0644 D28C       356            setb TR0
 0646            357            
 0646 C002       358            push AR2
-0648 7AC8       358            mov R2, #200
+0648 7A32       358            mov R2, #50
 064A 120039     358            lcall ?Wait_Milli_Seconds
 064D D002       358            pop AR2
 064F C28C       359            clr TR0
 0651            360            
 0651 C002       361            push AR2
-0653 7AC8       361            mov R2, #200
+0653 7A32       361            mov R2, #50
 0655 120039     361            lcall ?Wait_Milli_Seconds
 0658 D002       361            pop AR2
 065A C28C       362            clr TR0
@@ -483,18 +483,18 @@
 065F 75F278     364            mov RL0, #low(TIMER0_RELOADE)
 0662 D28C       365            setb TR0
 0664 C002       366            push AR2
-0666 7AC8       366            mov R2, #200
+0666 7A32       366            mov R2, #50
 0668 120039     366            lcall ?Wait_Milli_Seconds
 066B D002       366            pop AR2
 066D            367            
 066D C002       368            push AR2
-066F 7AC8       368            mov R2, #200
+066F 7A32       368            mov R2, #50
 0671 120039     368            lcall ?Wait_Milli_Seconds
 0674 D002       368            pop AR2
 0676 C28C       369            clr TR0
 0678            370            
 0678 C002       371            push AR2
-067A 7AC8       371            mov R2, #200
+067A 7A32       371            mov R2, #50
 067C 120039     371            lcall ?Wait_Milli_Seconds
 067F D002       371            pop AR2
 0681 C28C       372            clr TR0
@@ -503,13 +503,13 @@
 0689 D28C       375            setb TR0
 068B            376            
 068B C002       377            push AR2
-068D 7AC8       377            mov R2, #200
+068D 7A32       377            mov R2, #50
 068F 120039     377            lcall ?Wait_Milli_Seconds
 0692 D002       377            pop AR2
 0694 C28C       378            clr TR0
 0696            379            
 0696 C002       380            push AR2
-0698 7AC8       380            mov R2, #200
+0698 7A32       380            mov R2, #50
 069A 120039     380            lcall ?Wait_Milli_Seconds
 069D D002       380            pop AR2
 069F C28C       381            clr TR0
@@ -518,13 +518,13 @@
 06A7 D28C       384            setb TR0
 06A9            385            
 06A9 C002       386            push AR2
-06AB 7AC8       386            mov R2, #200
+06AB 7A32       386            mov R2, #50
 06AD 120039     386            lcall ?Wait_Milli_Seconds
 06B0 D002       386            pop AR2
 06B2 C28C       387            clr TR0
 06B4            388            
 06B4 C002       389            push AR2
-06B6 7AC8       389            mov R2, #200
+06B6 7A32       389            mov R2, #50
 06B8 120039     389            lcall ?Wait_Milli_Seconds
 06BB D002       389            pop AR2
 06BD C28C       390            clr TR0
@@ -533,13 +533,13 @@
 06C5 D28C       393            setb TR0
 06C7            394            
 06C7 C002       395            push AR2
-06C9 7AC8       395            mov R2, #200
+06C9 7A32       395            mov R2, #50
 06CB 120039     395            lcall ?Wait_Milli_Seconds
 06CE D002       395            pop AR2
 06D0 C28C       396            clr TR0
 06D2            397            
 06D2 C002       398            push AR2
-06D4 7AC8       398            mov R2, #200
+06D4 7A32       398            mov R2, #50
 06D6 120039     398            lcall ?Wait_Milli_Seconds
 06D9 D002       398            pop AR2
 06DB C28C       399            clr TR0
@@ -548,13 +548,13 @@
 06E3 D28C       402            setb TR0
 06E5            403            
 06E5 C002       404            push AR2
-06E7 7AC8       404            mov R2, #200
+06E7 7A32       404            mov R2, #50
 06E9 120039     404            lcall ?Wait_Milli_Seconds
 06EC D002       404            pop AR2
 06EE C28C       405            clr TR0
 06F0            406            
 06F0 C002       407            push AR2
-06F2 7AC8       407            mov R2, #200
+06F2 7A32       407            mov R2, #50
 06F4 120039     407            lcall ?Wait_Milli_Seconds
 06F7 D002       407            pop AR2
 06F9 C28C       408            clr TR0
@@ -563,13 +563,13 @@
 0701 D28C       411            setb TR0
 0703            412            
 0703 C002       413            push AR2
-0705 7AC8       413            mov R2, #200
+0705 7A32       413            mov R2, #50
 0707 120039     413            lcall ?Wait_Milli_Seconds
 070A D002       413            pop AR2
 070C C28C       414            clr TR0
 070E            415            
 070E C002       416            push AR2
-0710 7AC8       416            mov R2, #200
+0710 7A32       416            mov R2, #50
 0712 120039     416            lcall ?Wait_Milli_Seconds
 0715 D002       416            pop AR2
 0717 C28C       417            clr TR0
@@ -578,13 +578,13 @@
 071F D28C       420            setb TR0
 0721            421            
 0721 C002       422            push AR2
-0723 7AC8       422            mov R2, #200
+0723 7A32       422            mov R2, #50
 0725 120039     422            lcall ?Wait_Milli_Seconds
 0728 D002       422            pop AR2
 072A C28C       423            clr TR0
 072C            424            
 072C C002       425            push AR2
-072E 7AC8       425            mov R2, #200
+072E 7A32       425            mov R2, #50
 0730 120039     425            lcall ?Wait_Milli_Seconds
 0733 D002       425            pop AR2
 0735 C28C       426            clr TR0
@@ -592,12 +592,12 @@
 073A 75F2A4     428            mov RL0, #low(TIMER0_RELOADA)
 073D D28C       429            setb TR0
 073F C002       430            push AR2
-0741 7AC8       430            mov R2, #200
+0741 7A32       430            mov R2, #50
 0743 120039     430            lcall ?Wait_Milli_Seconds
 0746 D002       430            pop AR2
 0748            431            
 0748 C002       432            push AR2
-074A 7AC8       432            mov R2, #200
+074A 7A32       432            mov R2, #50
 074C 120039     432            lcall ?Wait_Milli_Seconds
 074F D002       432            pop AR2
 0751 C28C       433            clr TR0
@@ -765,11 +765,11 @@
 0865            595   NoWinner1:
 0865 E557       596            mov a, Player2Counter
 0867 B40403     597            cjne a, #0x04, NoWinner2
-086A 020B10     598            ljmp GameOver
+086A 020B6B     598            ljmp Player2Wins
 086D            599   NoWinner2:
 086D E55B       600            mov a, Player3Counter
 086F B40403     601            cjne a, #0x04, NoWinner3
-0872 020B10     602            ljmp GameOver
+0872 020BC4     602            ljmp Player3Wins
 0875            603   NoWinner3:
 0875 E55F       604            mov a, Player4Counter
 0877 B40403     605            cjne a, #0x04, NoWinner4
@@ -1137,133 +1137,135 @@
 0B10            855   GameOver:
 0B10 B28C       856       cpl TR0
 0B12 E553       857            mov a, Player1Counter
-0B14 B40457     858            cjne a, #0x4, Player2Wins
-0B17            859            
-0B17 C0E0       860            push acc
-0B19 740F       860            mov a, #15
-0B1B 14         860            dec a
-0B1C 1200BF     860            lcall ?Set_Cursor_1 ; Select column and row
-0B1F D0E0       860            pop acc
-0B21 C083       861            push dph
-0B23 C082       861            push dpl
-0B25 C0E0       861            push acc
-0B27 9003CB     861            mov dptr, #BlankSpace
-0B2A 1200B2     861            lcall ?Send_Constant_String
-0B2D D0E0       861            pop acc
-0B2F D082       861            pop dpl
-0B31 D083       861            pop dph
-0B33 C0E0       862            push acc
-0B35 7401       862            mov a, #1
-0B37 14         862            dec a
-0B38 1200BD     862            lcall ?Set_Cursor_2 ; Select column and row
-0B3B D0E0       862            pop acc
-0B3D C083       863            push dph
-0B3F C082       863            push dpl
-0B41 C0E0       863            push acc
-0B43 9003CE     863            mov dptr, #BlankRow
-0B46 1200B2     863            lcall ?Send_Constant_String
-0B49 D0E0       863            pop acc
-0B4B D082       863            pop dpl
-0B4D D083       863            pop dph
-0B4F C0E0       864            push acc
-0B51 7401       864            mov a, #1
-0B53 14         864            dec a
-0B54 1200BF     864            lcall ?Set_Cursor_1 ; Select column and row
-0B57 D0E0       864            pop acc
-0B59 C083       865            push dph
-0B5B C082       865            push dpl
-0B5D C0E0       865            push acc
-0B5F 900392     865            mov dptr, #EndMessage1
-0B62 1200B2     865            lcall ?Send_Constant_String
-0B65 D0E0       865            pop acc
-0B67 D082       865            pop dpl
-0B69 D083       865            pop dph
-0B6B 020C1B     866            ljmp DeadEnd
-0B6E            867   Player2Wins:
-0B6E            868            
-0B6E E55B       869            mov a, Player3Counter
-0B70 B40454     870            cjne a, #0x04, Player3Wins
-0B73 C0E0       871            push acc
-0B75 740F       871            mov a, #15
-0B77 14         871            dec a
-0B78 1200BF     871            lcall ?Set_Cursor_1 ; Select column and row
-0B7B D0E0       871            pop acc
-0B7D C083       872            push dph
-0B7F C082       872            push dpl
-0B81 C0E0       872            push acc
-0B83 9003CB     872            mov dptr, #BlankSpace
-0B86 1200B2     872            lcall ?Send_Constant_String
-0B89 D0E0       872            pop acc
-0B8B D082       872            pop dpl
-0B8D D083       872            pop dph
-0B8F C0E0       873            push acc
-0B91 7401       873            mov a, #1
-0B93 14         873            dec a
-0B94 1200BD     873            lcall ?Set_Cursor_2 ; Select column and row
-0B97 D0E0       873            pop acc
-0B99 C083       874            push dph
-0B9B C082       874            push dpl
-0B9D C0E0       874            push acc
-0B9F 9003CE     874            mov dptr, #BlankRow
-0BA2 1200B2     874            lcall ?Send_Constant_String
-0BA5 D0E0       874            pop acc
-0BA7 D082       874            pop dpl
-0BA9 D083       874            pop dph
-0BAB C0E0       875            push acc
-0BAD 7401       875            mov a, #1
-0BAF 14         875            dec a
-0BB0 1200BF     875            lcall ?Set_Cursor_1 ; Select column and row
-0BB3 D0E0       875            pop acc
-0BB5 C083       876            push dph
-0BB7 C082       876            push dpl
-0BB9 C0E0       876            push acc
-0BBB 9003A1     876            mov dptr, #EndMessage2
-0BBE 1200B2     876            lcall ?Send_Constant_String
-0BC1 D0E0       876            pop acc
-0BC3 D082       876            pop dpl
-0BC5 D083       876            pop dph
-0BC7            877   Player3Wins:
-0BC7 C0E0       878            push acc
-0BC9 740F       878            mov a, #15
-0BCB 14         878            dec a
-0BCC 1200BF     878            lcall ?Set_Cursor_1 ; Select column and row
-0BCF D0E0       878            pop acc
-0BD1 C083       879            push dph
-0BD3 C082       879            push dpl
-0BD5 C0E0       879            push acc
-0BD7 9003CB     879            mov dptr, #BlankSpace
-0BDA 1200B2     879            lcall ?Send_Constant_String
-0BDD D0E0       879            pop acc
-0BDF D082       879            pop dpl
-0BE1 D083       879            pop dph
-0BE3 C0E0       880            push acc
-0BE5 7401       880            mov a, #1
-0BE7 14         880            dec a
-0BE8 1200BD     880            lcall ?Set_Cursor_2 ; Select column and row
-0BEB D0E0       880            pop acc
-0BED C083       881            push dph
-0BEF C082       881            push dpl
-0BF1 C0E0       881            push acc
-0BF3 9003CE     881            mov dptr, #BlankRow
-0BF6 1200B2     881            lcall ?Send_Constant_String
-0BF9 D0E0       881            pop acc
-0BFB D082       881            pop dpl
-0BFD D083       881            pop dph
-0BFF C0E0       882            push acc
-0C01 7401       882            mov a, #1
-0C03 14         882            dec a
-0C04 1200BF     882            lcall ?Set_Cursor_1 ; Select column and row
-0C07 D0E0       882            pop acc
-0C09 C083       883            push dph
-0C0B C082       883            push dpl
-0C0D C0E0       883            push acc
-0C0F 9003B0     883            mov dptr, #EndMessage3
-0C12 1200B2     883            lcall ?Send_Constant_String
-0C15 D0E0       883            pop acc
-0C17 D082       883            pop dpl
-0C19 D083       883            pop dph
-0C1B            884            
-0C1B            885   DeadEnd:
-0C1B 120754     886       lcall Victory_Song
-0C1E 12059D     887       lcall Victory_Song2
-0C21            888   end
+0B14            858            ;cjne a, #0x04, Player2Wins
+0B14            859            
+0B14 C0E0       860            push acc
+0B16 740F       860            mov a, #15
+0B18 14         860            dec a
+0B19 1200BF     860            lcall ?Set_Cursor_1 ; Select column and row
+0B1C D0E0       860            pop acc
+0B1E C083       861            push dph
+0B20 C082       861            push dpl
+0B22 C0E0       861            push acc
+0B24 9003CB     861            mov dptr, #BlankSpace
+0B27 1200B2     861            lcall ?Send_Constant_String
+0B2A D0E0       861            pop acc
+0B2C D082       861            pop dpl
+0B2E D083       861            pop dph
+0B30 C0E0       862            push acc
+0B32 7401       862            mov a, #1
+0B34 14         862            dec a
+0B35 1200BD     862            lcall ?Set_Cursor_2 ; Select column and row
+0B38 D0E0       862            pop acc
+0B3A C083       863            push dph
+0B3C C082       863            push dpl
+0B3E C0E0       863            push acc
+0B40 9003CE     863            mov dptr, #BlankRow
+0B43 1200B2     863            lcall ?Send_Constant_String
+0B46 D0E0       863            pop acc
+0B48 D082       863            pop dpl
+0B4A D083       863            pop dph
+0B4C C0E0       864            push acc
+0B4E 7401       864            mov a, #1
+0B50 14         864            dec a
+0B51 1200BF     864            lcall ?Set_Cursor_1 ; Select column and row
+0B54 D0E0       864            pop acc
+0B56 C083       865            push dph
+0B58 C082       865            push dpl
+0B5A C0E0       865            push acc
+0B5C 900392     865            mov dptr, #EndMessage1
+0B5F 1200B2     865            lcall ?Send_Constant_String
+0B62 D0E0       865            pop acc
+0B64 D082       865            pop dpl
+0B66 D083       865            pop dph
+0B68 020C18     866            ljmp DeadEnd
+0B6B            867   Player2Wins:
+0B6B            868            
+0B6B E557       869            mov a, Player2Counter
+0B6D            870            ;cjne a, #0x04, Player3Wins
+0B6D C0E0       871            push acc
+0B6F 740F       871            mov a, #15
+0B71 14         871            dec a
+0B72 1200BF     871            lcall ?Set_Cursor_1 ; Select column and row
+0B75 D0E0       871            pop acc
+0B77 C083       872            push dph
+0B79 C082       872            push dpl
+0B7B C0E0       872            push acc
+0B7D 9003CB     872            mov dptr, #BlankSpace
+0B80 1200B2     872            lcall ?Send_Constant_String
+0B83 D0E0       872            pop acc
+0B85 D082       872            pop dpl
+0B87 D083       872            pop dph
+0B89 C0E0       873            push acc
+0B8B 7401       873            mov a, #1
+0B8D 14         873            dec a
+0B8E 1200BD     873            lcall ?Set_Cursor_2 ; Select column and row
+0B91 D0E0       873            pop acc
+0B93 C083       874            push dph
+0B95 C082       874            push dpl
+0B97 C0E0       874            push acc
+0B99 9003CE     874            mov dptr, #BlankRow
+0B9C 1200B2     874            lcall ?Send_Constant_String
+0B9F D0E0       874            pop acc
+0BA1 D082       874            pop dpl
+0BA3 D083       874            pop dph
+0BA5 C0E0       875            push acc
+0BA7 7401       875            mov a, #1
+0BA9 14         875            dec a
+0BAA 1200BF     875            lcall ?Set_Cursor_1 ; Select column and row
+0BAD D0E0       875            pop acc
+0BAF C083       876            push dph
+0BB1 C082       876            push dpl
+0BB3 C0E0       876            push acc
+0BB5 9003A1     876            mov dptr, #EndMessage2
+0BB8 1200B2     876            lcall ?Send_Constant_String
+0BBB D0E0       876            pop acc
+0BBD D082       876            pop dpl
+0BBF D083       876            pop dph
+0BC1 020C18     877            ljmp DeadEnd
+0BC4            878            
+0BC4            879   Player3Wins:
+0BC4 C0E0       880            push acc
+0BC6 740F       880            mov a, #15
+0BC8 14         880            dec a
+0BC9 1200BF     880            lcall ?Set_Cursor_1 ; Select column and row
+0BCC D0E0       880            pop acc
+0BCE C083       881            push dph
+0BD0 C082       881            push dpl
+0BD2 C0E0       881            push acc
+0BD4 9003CB     881            mov dptr, #BlankSpace
+0BD7 1200B2     881            lcall ?Send_Constant_String
+0BDA D0E0       881            pop acc
+0BDC D082       881            pop dpl
+0BDE D083       881            pop dph
+0BE0 C0E0       882            push acc
+0BE2 7401       882            mov a, #1
+0BE4 14         882            dec a
+0BE5 1200BD     882            lcall ?Set_Cursor_2 ; Select column and row
+0BE8 D0E0       882            pop acc
+0BEA C083       883            push dph
+0BEC C082       883            push dpl
+0BEE C0E0       883            push acc
+0BF0 9003CE     883            mov dptr, #BlankRow
+0BF3 1200B2     883            lcall ?Send_Constant_String
+0BF6 D0E0       883            pop acc
+0BF8 D082       883            pop dpl
+0BFA D083       883            pop dph
+0BFC C0E0       884            push acc
+0BFE 7401       884            mov a, #1
+0C00 14         884            dec a
+0C01 1200BF     884            lcall ?Set_Cursor_1 ; Select column and row
+0C04 D0E0       884            pop acc
+0C06 C083       885            push dph
+0C08 C082       885            push dpl
+0C0A C0E0       885            push acc
+0C0C 9003B0     885            mov dptr, #EndMessage3
+0C0F 1200B2     885            lcall ?Send_Constant_String
+0C12 D0E0       885            pop acc
+0C14 D082       885            pop dpl
+0C16 D083       885            pop dph
+0C18            886            
+0C18            887   DeadEnd:
+0C18 120754     888       lcall Victory_Song
+0C1B 12059D     889       lcall Victory_Song2
+0C1E            890   end
