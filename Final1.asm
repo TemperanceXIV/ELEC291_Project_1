@@ -49,16 +49,21 @@ SOUND_OUT equ p1.1
 
 CLK equ 22118400
 TIMER0_RATE equ 4096
-TIMER0_RATEA equ 500*2
-TIMER0_RATEE equ 750*2
-TIMER0_RATEFS equ 850*2
-TIMER0_RATED equ 600*2
-TIMER0_RATECS equ 500*2
-TIMER0_RATEB equ 600*2
+TIMER0_RATEA EQU 1580*2
+TIMER0_RATEE EQU 2350*2
+TIMER0_RATEFS EQU 2600*2
+TIMER0_RATED EQU 2100*2
+TIMER0_RATECS EQU 2000*2
+TIMER0_RATEB EQU 1780*2
 
 TIMER0_RELOAD1 equ ((65536-(CLK/1000)))
 TIMER0_RELOAD2 equ ((65536-(CLK/2000)))
-TIMER0_RELOADA equ ((65536-(CLK/TIMER0_RATEA)))
+TIMER0_RELOADA EQU ((65536-(CLK/TIMER0_RATEA)))
+TIMER0_RELOADE EQU ((65536-(CLK/TIMER0_RATEE)))
+TIMER0_RELOADFS EQU ((65536-(CLK/TIMER0_RATEFS)))
+TIMER0_RELOADD EQU ((65536-(CLK/TIMER0_RATED)))
+TIMER0_RELOADCS EQU ((65536-(CLK/TIMER0_RATECS)))
+TIMER0_RELOADB EQU ((65536-(CLK/TIMER0_RATEB)))
 
 
 $NOLIST
@@ -73,18 +78,16 @@ Counter1: ds 2
 
 
 
-
-
 cseg
-;                      1234567890123456    <- This helps determine the location of the counter
-Initial_Message1:  db 'Period A:       ', 0
-Initial_Message2:  db 'Period B:       ', 0
-EndMessage1: db 'Player 1 Wins!', 0
-EndMessage2: db 'Player 2 Wins!', 0
-EndMessage3: db 'Player 3 Wins!', 0
-P1: db 'P1:', 0
-P2: db 'P2:', 0
-P3: db 'P3:', 0
+;                       1234567890123456    <- This helps determine the location of the counter
+Initial_Message1:  	db 'Period A:       ', 0
+Initial_Message2:  	db 'Period B:       ', 0
+EndMessage1: 		db 'Player 1 Wins!', 0
+EndMessage2: 		db 'Player 2 Wins!', 0
+EndMessage3: 		db 'Player 3 Wins!', 0
+PL1: 				db 'P1:', 0
+PL2: 				db 'P2:', 0
+PL3: 				db 'P3:', 0
 BlankSpace: db '00', 0
 BlankROw: db '0000000000000000'
 
@@ -261,11 +264,7 @@ Timer0_ISR:
 	;clr TF0  ; According to the data sheet this is done for us already.
 	
 	
-	cpl SOUND_OUT ; Connect speaker to P1.1!
-	
-
-	
-	
+	cpl SOUND_OUT ; Connect speaker to P1.1!	
 	reti
 ;---------------------------------;
 ; Hardware initialization         ;
@@ -289,13 +288,286 @@ Initialize_All:
     mov Player4Counter, #0x00
     mov CurrentFreq, #0x00
     Set_Cursor(1,1)
-    Send_Constant_String(#P1)
+    Send_Constant_String(#PL1)
     Set_Cursor(1,3)
-    Send_Constant_String(#P2)
+    Send_Constant_String(#PL2)
     Set_Cursor(1,5)
-    Send_Constant_String(#P3)
+    Send_Constant_String(#PL3)
    
 	ret
+
+WaitHalfSec:
+	Wait_Milli_Seconds(#100)
+	Wait_Milli_Seconds(#100)
+	Wait_Milli_Seconds(#100)
+	Wait_Milli_Seconds(#100)
+
+ret
+Victory_Song2:
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADA)
+	mov RL0, #low(TIMER0_RELOADA)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADA)
+	mov RL0, #low(TIMER0_RELOADA)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADE)
+	mov RL0, #low(TIMER0_RELOADE)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADE)
+	mov RL0, #low(TIMER0_RELOADE)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADFS)
+	mov RL0, #low(TIMER0_RELOADFS)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADFS)
+	mov RL0, #low(TIMER0_RELOADFS)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADE)
+	mov RL0, #low(TIMER0_RELOADE)
+	setb TR0
+	Wait_Milli_Seconds(#200)
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADD)
+	mov RL0, #low(TIMER0_RELOADD)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADD)
+	mov RL0, #low(TIMER0_RELOADD)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADCS)
+	mov RL0, #low(TIMER0_RELOADCS)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADCS)
+	mov RL0, #low(TIMER0_RELOADCS)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADB)
+	mov RL0, #low(TIMER0_RELOADB)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADB)
+	mov RL0, #low(TIMER0_RELOADB)
+	setb TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADA)
+	mov RL0, #low(TIMER0_RELOADA)
+	setb TR0
+	Wait_Milli_Seconds(#200)
+	
+	Wait_Milli_Seconds(#200)
+	clr TR0
+
+ret
+
+;---------------------------------;
+; Main program loop               ;
+;---------------------------------;  
+; Play a song function. Pause the game while active
+Victory_Song:
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADA)
+	mov RL0, #low(TIMER0_RELOADA)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADA)
+	mov RL0, #low(TIMER0_RELOADA)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADE)
+	mov RL0, #low(TIMER0_RELOADE)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADE)
+	mov RL0, #low(TIMER0_RELOADE)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADFS)
+	mov RL0, #low(TIMER0_RELOADFS)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADFS)
+	mov RL0, #low(TIMER0_RELOADFS)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADE)
+	mov RL0, #low(TIMER0_RELOADE)
+	setb TR0
+	lcall WaitHalfSec
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADD)
+	mov RL0, #low(TIMER0_RELOADD)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADD)
+	mov RL0, #low(TIMER0_RELOADD)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADCS)
+	mov RL0, #low(TIMER0_RELOADCS)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADCS)
+	mov RL0, #low(TIMER0_RELOADCS)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADB)
+	mov RL0, #low(TIMER0_RELOADB)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADB)
+	mov RL0, #low(TIMER0_RELOADB)
+	setb TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	
+	lcall WaitHalfSec
+	clr TR0
+	mov RH0, #high(TIMER0_RELOADA)
+	mov RL0, #low(TIMER0_RELOADA)
+	setb TR0
+	lcall WaitHalfSec
+	
+	lcall WaitHalfSec
+	clr TR0
+
+ret
 
 ;---------------------------------;
 ; Main program loop               ;
@@ -608,9 +880,9 @@ Player3Wins:
 	Set_Cursor(2, 1)
 	Send_Constant_String(#BlankRow)
 	Set_Cursor(1, 1)
-	Send_Constant_String(#EndMessage2)
+	Send_Constant_String(#EndMessage3)
 	
 DeadEnd:
-    
-    
+    lcall Victory_Song
+    lcall Victory_Song2
 end
