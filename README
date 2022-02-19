@@ -11,8 +11,12 @@ Extra Functionality:
 2) Added Victory Song at the end with 2 different speeds
   - Song name is Twinkle Twinkle Little Star (6 different note frequencies)
 3) Changed game rules around:
-  - When high note plays, player wants to press capacitor in order to gain point
-  - When low note plays, player wants to sabotage other players' capacitor to make them lose point
-  - Game continues until any player hits 4 points
+  - When high note plays, player wants to press capacitor in order to gain a point
+  - When low note plays, player wants to sabotage other players' capacitor to make them lose a point
+  - Game continues until any  one player hits 4 points
 4) High sensitivity
   - Able to detect changes with one finger on one side of the capacitor
+5) Complete random time in terms of when the next tone will sound
+6) Complete random next tone to be played on speaker
+7) Easily customizable victory tune because of pre-set frequency for different notes
+8) Project has potential to be used in arcade, or produced as a multi-player game for all ages as it is fun and interactive
