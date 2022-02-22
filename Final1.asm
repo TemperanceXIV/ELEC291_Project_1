@@ -591,7 +591,7 @@ forever:
 ;   lcall Timer0_Init
 	mov a, Player1Counter
 	cjne a, #0x04, NoWinner1
-	ljmp GameOver
+	ljmp Player1Wins
 NoWinner1:
 	mov a, Player2Counter
 	cjne a, #0x04, NoWinner2
@@ -854,9 +854,9 @@ NextTwo:
 
 GameOver:
     cpl TR0
-	mov a, Player1Counter
+	;mov a, Player1Counter
 	;cjne a, #0x04, Player2Wins
-	
+Player1Wins:
 	Set_Cursor(1, 15)
 	Send_Constant_String(#BlankSpace)
 	Set_Cursor(2, 1)
@@ -866,7 +866,7 @@ GameOver:
 	ljmp DeadEnd
 Player2Wins:
 	
-	mov a, Player2Counter
+	;mov a, Player2Counter
 	;cjne a, #0x04, Player3Wins
 	Set_Cursor(1, 15)
 	Send_Constant_String(#BlankSpace)

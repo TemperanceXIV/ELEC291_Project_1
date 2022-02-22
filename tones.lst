@@ -3,212 +3,2571 @@
 0000              5   CLK           EQU 22118400 ; Microcontroller system crystal frequency in Hz
 0000              6   TIMER0_RATE0  EQU ((2048*2)+100)
 0000              7   TIMER0_RATE1  EQU ((2048*2)-100)
-0000              8   TIMER0_RATEA EQU 1580*2
-0000              9   TIMER0_RATEE EQU 2350*2
-0000             10   TIMER0_RATEFS EQU 2600*2
-0000             11   TIMER0_RATED EQU 2100*2
-0000             12   TIMER0_RATECS EQU 2000*2
-0000             13   TIMER0_RATEB EQU 1780*2
-0000             14   
-0000             15   TIMER0_RELOAD0 EQU ((65536-(CLK/TIMER0_RATE0)))
-0000             16   TIMER0_RELOAD1 EQU ((65536-(CLK/TIMER0_RATE1)))
-0000             17   TIMER0_RELOADA EQU ((65536-(CLK/TIMER0_RATEA)))
-0000             18   TIMER0_RELOADE EQU ((65536-(CLK/TIMER0_RATEE)))
-0000             19   TIMER0_RELOADFS EQU ((65536-(CLK/TIMER0_RATEFS)))
-0000             20   TIMER0_RELOADD EQU ((65536-(CLK/TIMER0_RATED)))
-0000             21   TIMER0_RELOADCS EQU ((65536-(CLK/TIMER0_RATECS)))
-0000             22   TIMER0_RELOADB EQU ((65536-(CLK/TIMER0_RATEB)))
-0000             23   
-0000             24   SOUND_OUT EQU P1.1
-0000             25   
-0000             26   org 0000H
-0000 020037      27      ljmp Startup
-0003             28   
-0003             29   ; Timer/Counter 0 overflow interrupt vector
-000B             30   org 0x000B
-000B 020027      31            ljmp Timer0_ISR
-000E             32   
-000E             33   ;---------------------------------;
-000E             34   ; Routine to initialize the ISR   ;
-000E             35   ; for timer 0                     ;
-000E             36   ;---------------------------------;
-000E             37   InitTimer0:
-000E E589        38            mov a, TMOD
-0010 54F0        39            anl a, #0xf0 ; 11110000 Clear the bits for timer 0
-0012 4401        40            orl a, #0x01 ; 00000001 Configure timer 0 as 16-timer
-0014 F589        41            mov TMOD, a
-0016 758CEA      42            mov TH0, #high(TIMER0_RELOAD1)
-0019 758A61      43            mov TL0, #low(TIMER0_RELOAD1)
-001C             44            ; Set autoreload value
-001C 75F4EA      45            mov RH0, #high(TIMER0_RELOAD1)
-001F 75F261      46            mov RL0, #low(TIMER0_RELOAD1)
-0022             47            ; Enable the timer and interrupts
-0022 D2A9        48       setb ET0  ; Enable timer 0 interrupt
-0024 D28C        49       setb TR0  ; Start timer 0
-0026 22          50            ret
-0027             51   
-0027             52   ;---------------------------------;
-0027             53   ; ISR for timer 0.  Set to execute;
-0027             54   ; every 1/4096Hz to generate a    ;
-0027             55   ; 2048 Hz square wave at pin P1.1 ;
-0027             56   ;---------------------------------;
-0027             57   Timer0_ISR:
-0027 B291        58            cpl SOUND_OUT ; Connect speaker to P1.1!
-0029 32          59            reti
-002A             60   
-002A             61   ; When using a 22.1184MHz crystal in fast mode
-002A             62   ; one cycle takes 1.0/22.1184MHz = 45.21123 ns
-002A             63   WaitHalfSec:
-002A 7A59        64       mov R2, #89
-002C 79FA        65   L3: mov R1, #250
-002E 78A6        66   L2: mov R0, #166
-0030 D8FE        67   L1: djnz R0, L1 ; 3 cycles->3*45.21123ns*166=22.51519us
-0032 D9FA        68       djnz R1, L2 ; 22.51519us*250=5.629ms
-0034 DAF6        69       djnz R2, L3 ; 5.629ms*89=0.5s (approximately)
-0036 22          70       ret
-0037             71   
-0037             72   ;---------------------------------;
-0037             73   ; Hardware and variable           ;
-0037             74   ; initialization                  ;
-0037             75   ;---------------------------------;
-0037             76   Startup:
-0037             77       ; Initialize the hardware:
-0037 75817F      78       mov SP, #7FH
-003A 12000E      79       lcall InitTimer0
-003D D2AF        80       setb EA
-003F             81       
-003F             82   ;---------------------------------;
-003F             83   ; Main program loop               ;
-003F             84   ;---------------------------------;  
-003F             85   forever:
-003F 12002A      86            lcall WaitHalfSec
-0042 C28C        87            clr TR0
-0044 75F492      88            mov RH0, #high(TIMER0_RELOADA)
-0047 75F2A4      89            mov RL0, #low(TIMER0_RELOADA)
-004A D28C        90            setb TR0
-004C             91            
-004C 12002A      92            lcall WaitHalfSec
-004F C28C        93            clr TR0
-0051             94            
-0051 12002A      95            lcall WaitHalfSec
-0054 C28C        96            clr TR0
-0056 75F492      97            mov RH0, #high(TIMER0_RELOADA)
-0059 75F2A4      98            mov RL0, #low(TIMER0_RELOADA)
-005C D28C        99            setb TR0
-005E            100            
-005E 12002A     101            lcall WaitHalfSec
-0061 C28C       102            clr TR0
-0063            103            
-0063 12002A     104            lcall WaitHalfSec
-0066 C28C       105            clr TR0
-0068 75F4B6     106            mov RH0, #high(TIMER0_RELOADE)
-006B 75F278     107            mov RL0, #low(TIMER0_RELOADE)
-006E D28C       108            setb TR0
-0070            109            
-0070 12002A     110            lcall WaitHalfSec
-0073 C28C       111            clr TR0
-0075            112            
-0075 12002A     113            lcall WaitHalfSec
-0078 C28C       114            clr TR0
-007A 75F4B6     115            mov RH0, #high(TIMER0_RELOADE)
-007D 75F278     116            mov RL0, #low(TIMER0_RELOADE)
-0080 D28C       117            setb TR0
-0082            118            
-0082 12002A     119            lcall WaitHalfSec
-0085 C28C       120            clr TR0
-0087            121            
-0087 12002A     122            lcall WaitHalfSec
-008A C28C       123            clr TR0
-008C 75F4BD     124            mov RH0, #high(TIMER0_RELOADFS)
-008F 75F28A     125            mov RL0, #low(TIMER0_RELOADFS)
-0092 D28C       126            setb TR0
-0094            127            
-0094 12002A     128            lcall WaitHalfSec
-0097 C28C       129            clr TR0
-0099            130            
-0099 12002A     131            lcall WaitHalfSec
-009C C28C       132            clr TR0
-009E 75F4BD     133            mov RH0, #high(TIMER0_RELOADFS)
-00A1 75F28A     134            mov RL0, #low(TIMER0_RELOADFS)
-00A4 D28C       135            setb TR0
-00A6            136            
-00A6 12002A     137            lcall WaitHalfSec
-00A9 C28C       138            clr TR0
-00AB            139            
-00AB 12002A     140            lcall WaitHalfSec
-00AE C28C       141            clr TR0
-00B0 75F4B6     142            mov RH0, #high(TIMER0_RELOADE)
-00B3 75F278     143            mov RL0, #low(TIMER0_RELOADE)
-00B6 D28C       144            setb TR0
-00B8 12002A     145            lcall WaitHalfSec
-00BB            146            
-00BB 12002A     147            lcall WaitHalfSec
-00BE C28C       148            clr TR0
-00C0            149            
-00C0 12002A     150            lcall WaitHalfSec
-00C3 C28C       151            clr TR0
-00C5 75F4AD     152            mov RH0, #high(TIMER0_RELOADD)
-00C8 75F2B8     153            mov RL0, #low(TIMER0_RELOADD)
-00CB D28C       154            setb TR0
-00CD            155            
-00CD 12002A     156            lcall WaitHalfSec
-00D0 C28C       157            clr TR0
-00D2            158            
-00D2 12002A     159            lcall WaitHalfSec
-00D5 C28C       160            clr TR0
-00D7 75F4AD     161            mov RH0, #high(TIMER0_RELOADD)
-00DA 75F2B8     162            mov RL0, #low(TIMER0_RELOADD)
-00DD D28C       163            setb TR0
-00DF            164            
-00DF 12002A     165            lcall WaitHalfSec
-00E2 C28C       166            clr TR0
-00E4            167            
-00E4 12002A     168            lcall WaitHalfSec
-00E7 C28C       169            clr TR0
-00E9 75F4A9     170            mov RH0, #high(TIMER0_RELOADCS)
-00EC 75F29A     171            mov RL0, #low(TIMER0_RELOADCS)
-00EF D28C       172            setb TR0
-00F1            173            
-00F1 12002A     174            lcall WaitHalfSec
-00F4 C28C       175            clr TR0
-00F6            176            
-00F6 12002A     177            lcall WaitHalfSec
-00F9 C28C       178            clr TR0
-00FB 75F4A9     179            mov RH0, #high(TIMER0_RELOADCS)
-00FE 75F29A     180            mov RL0, #low(TIMER0_RELOADCS)
-0101 D28C       181            setb TR0
-0103            182            
-0103 12002A     183            lcall WaitHalfSec
-0106 C28C       184            clr TR0
-0108            185            
-0108 12002A     186            lcall WaitHalfSec
-010B C28C       187            clr TR0
-010D 75F49E     188            mov RH0, #high(TIMER0_RELOADB)
-0110 75F2EC     189            mov RL0, #low(TIMER0_RELOADB)
-0113 D28C       190            setb TR0
-0115            191            
-0115 12002A     192            lcall WaitHalfSec
-0118 C28C       193            clr TR0
-011A            194            
-011A 12002A     195            lcall WaitHalfSec
-011D C28C       196            clr TR0
-011F 75F49E     197            mov RH0, #high(TIMER0_RELOADB)
-0122 75F2EC     198            mov RL0, #low(TIMER0_RELOADB)
-0125 D28C       199            setb TR0
-0127            200            
-0127 12002A     201            lcall WaitHalfSec
-012A C28C       202            clr TR0
-012C            203            
-012C 12002A     204            lcall WaitHalfSec
-012F C28C       205            clr TR0
-0131 75F492     206            mov RH0, #high(TIMER0_RELOADA)
-0134 75F2A4     207            mov RL0, #low(TIMER0_RELOADA)
-0137 D28C       208            setb TR0
-0139 12002A     209            lcall WaitHalfSec
-013C            210            
-013C 12002A     211            lcall WaitHalfSec
-013F C28C       212            clr TR0
-0141            213            
-0141 02003F     214       ljmp forever ; Repeat! 
-0144            215   
-0144            216   end
+0000              8   TIMER0_RATE   EQU 4096     ; 2048Hz squarewave (peak amplitude of CEM-1203 speaker)
+0000              9   TIMER0_RELOAD EQU ((65536-(CLK/TIMER0_RATE)))
+0000             10   ; Timer rates are calculated away from the desired frequency. 8 times
+0000             11   TIMER0_RATEA EQU 1760*2          ;A5 = 880 Hz
+0000             12   TIMER0_RATEE EQU 2350*2          ;D5 = 587.33 Hz
+0000             13   TIMER0_RATEEf EQU 2600*2         ; = 525 Hz
+0000             14   TIMER0_RATED EQU 2100*2
+0000             15   TIMER0_RATECS EQU 2000*2
+0000             16   TIMER0_RATEB EQU 1780*2
+0000             17   
+0000             18   TIMER0_RELOAD0 EQU ((65536-(CLK/TIMER0_RATE0)))
+0000             19   TIMER0_RELOAD1 EQU ((65536-(CLK/TIMER0_RATE1)))
+0000             20   TIMER0_RELOADA EQU ((65536-(CLK/TIMER0_RATEA)))
+0000             21   TIMER0_RELOADE EQU ((65536-(CLK/TIMER0_RATEE)))
+0000             22   TIMER0_RELOADFS EQU ((65536-(CLK/TIMER0_RATEEf)))
+0000             23   TIMER0_RELOADD EQU ((65536-(CLK/TIMER0_RATED)))
+0000             24   TIMER0_RELOADCS EQU ((65536-(CLK/TIMER0_RATECS)))
+0000             25   TIMER0_RELOADB EQU ((65536-(CLK/TIMER0_RATEB)))
+0000             26   
+0000             27   ; notes are calibrated to be input directly into the Play_Note macro?
+0000             28   ; Using an interval system with math.
+0000             29   key_A5   equ 880                 ; A5 = 880 Hz, CLK/(440*8) = 62817.727272...
+0000             30   key_B5f equ 932          ; B5f = 932.33333?
+0000             31   
+0000             32   ; Unison: 1:1
+0000             33   tone_P1a         equ 1
+0000             34   tone_P1b         equ 1
+0000             35   ; Minor Second is 16:15
+0000             36   tone_mi2a        equ 16
+0000             37   tone_mi2b        equ     15
+0000             38   ; Major Second: 9:8
+0000             39   tone_Ma2a        equ 9
+0000             40   tone_Ma2b        equ     8
+0000             41   ; Minor Third: 6:5
+0000             42   tone_mi3a        equ 6
+0000             43   tone_mi3b        equ 5
+0000             44   ; Major Third: 5:4
+0000             45   tone_Ma3a        equ 5
+0000             46   tone_Ma3b        equ 4
+0000             47   ; Perfect Fourth: 4:3
+0000             48   tone_P4a         equ 4
+0000             49   tone_P4b         equ 3
+0000             50   ; Tritone: 7:5
+0000             51   tone_tta         equ 7
+0000             52   tone_ttb         equ 5
+0000             53   ; Perfect Fifth: 3:2
+0000             54   tone_P5a         equ 3
+0000             55   tone_P5b         equ 2
+0000             56   ; Minor Sixth: 8:5
+0000             57   tone_mi6a        equ 8
+0000             58   tone_mi6b        equ 5
+0000             59   ; Major Sixth: 5:3
+0000             60   tone_Ma6a        equ 5
+0000             61   tone_Ma6b        equ 3
+0000             62   ; Minor Seventh: 9:5
+0000             63   tone_mi7a        equ 9
+0000             64   tone_mi7b        equ 5
+0000             65   ; Major Seventh: 15:8
+0000             66   tone_Ma7a        equ 15
+0000             67   tone_Ma7b        equ 8
+0000             68   ; Octave: 2:1
+0000             69   tone_P8a         equ 2
+0000             70   tone_P8b         equ 1
+0000             71   
+0000             72   SOUND_OUT EQU P1.1
+0000             73   
+0000             74   org 0x0000
+0000 0203A8      75      ljmp Startup
+0003             76   
+0003             77   ; Timer/Counter 0 overflow interrupt vector
+000B             78   org 0x000B
+000B 02038B      79            ljmp Timer0_ISR
+000E             80            
+                570   $LIST
+                 82   $LIST
+02A4             84   
+0030             85   dseg at 30H
+0030             86   x:       ds 4
+0034             87   y:       ds 4
+0038             88   bcd:ds 5
+003D             89   
+0000             90   bseg
+0000             91   mf: dbit 1
+0001             92   
+0001             93   ;Flag for whether to go up or down the interval.
+0001             94   ;stepUpDown: dbit 1
+0001             95   
+02A4             96   cseg
+02A4             97   ; These 'equ' must match the hardware wiring
+02A4             98   LCD_RS equ P3.2
+02A4             99   ;LCD_RW equ PX.X ; Not used in this code, connect the pin to GND
+02A4            100   LCD_E  equ P3.3
+02A4            101   LCD_D4 equ P3.4
+02A4            102   LCD_D5 equ P3.5
+02A4            103   LCD_D6 equ P3.6
+02A4            104   LCD_D7 equ P3.7
+02A4            105   
+                107   	$LIST
+0350            109   ;                                                1234567890123456 
+0350 48656C6C   110   Initial_Message1:        db 'Hello_World     ',0
+     6F5F576F
+     726C6420
+     20202020
+     00
+0361 20202020   111   Blank_Message:           db '                ',0
+     20202020
+     20202020
+     20202020
+     00
+0372            112   ;---------------------------------;
+0372            113   ; Routine to initialize the ISR   ;
+0372            114   ; for timer 0                     ;
+0372            115   ;---------------------------------;
+0372            116   InitTimer0:
+0372 E589       117            mov a, TMOD
+0374 54F0       118            anl a, #0xf0 ; 11110000 Clear the bits for timer 0
+0376 4401       119            orl a, #0x01 ; 00000001 Configure timer 0 as 16-timer
+0378 F589       120            mov TMOD, a
+037A 758CEA     121            mov TH0, #high(TIMER0_RELOAD)
+037D 758AE8     122            mov TL0, #low(TIMER0_RELOAD)
+0380            123            ; Set autoreload value
+0380 75F4EA     124            mov RH0, #high(TIMER0_RELOAD)
+0383 75F2E8     125            mov RL0, #low(TIMER0_RELOAD)
+0386            126            ; Enable the timer and interrupts
+0386 D2A9       127       setb ET0  ; Enable timer 0 interrupt
+0388 D28C       128       setb TR0  ; Start timer 0
+038A 22         129            ret
+038B            130   
+038B            131   ;---------------------------------;
+038B            132   ; ISR for timer 0.  Set to execute;
+038B            133   ; every 1/4096Hz to generate a    ;
+038B            134   ; 2048 Hz square wave at pin P1.1 ;
+038B            135   ;---------------------------------;
+038B            136   Timer0_ISR:
+038B B291       137            cpl SOUND_OUT ; Connect speaker to P1.1!
+038D 32         138            reti
+038E            139   
+038E            140   ; When using a 22.1184MHz crystal in fast mode
+038E            141   ; one cycle takes 1.0/22.1184MHz = 45.21123 ns
+038E            142   
+038E            143   
+038E            144      
+038E            145   ;---------------------------------;
+038E            146   ; Hardware and variable           ;
+038E            147   ; initialization                  ;
+038E            148   ;---------------------------------;
+038E            149   
+038E            150   ; BCD Display Macro
+                151   debug_BCD mac
+                152   lcall hex2bcd2
+                153   Set_Cursor(1,1)
+                154   Display_BCD(bcd+4)
+                155   Display_BCD(bcd+3)
+                156   Display_BCD(bcd+2)
+                157   Display_BCD(bcd+1)
+                158   Display_BCD(bcd+0)
+                159   
+                160   endmac
+038E            161       ; Note Macro 
+038E            162       ; Play_Note([key], [first ratio], [second ratio], [note duration])
+038E            163       ; Uses Resonant mechanics as opposed to equal-tempered mechanics
+038E            164       ; First Parameter, determine what is the fundamental frequency
+038E            165       ; Second Parameter, set the upper ratio for the note
+038E            166       ; Third Parameter, set the lower ratio for the note
+038E            167       ; Fourth Parameter, set the duration of the note
+038E            168       ; 1 = 16th note
+038E            169       ; 2 = 8th note
+038E            170       ; 4 = quarter note
+038E            171       ; 8 = half note
+038E            172       ; 16 = whole note
+038E            173       ; *You can compose notes of different values too*
+038E            174       ; Plays a note for a certain duration
+038E            175   ; select note base frequency as defined by fundamental frequency
+038E            176   ; select duration of note (in 50 miliseconds increments as it is going off a pure delay
+038E            177   ; The basic time increment is 0.05 seconds
+                178   Play_Note mac
+                179   	; Compute the reload value given the base frequency and interval ratio codes
+                180   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+                181   ;Calc_Interval:
+                182   ; Freq0 loaded (fundamental frequency)
+                183   Load_x(%0) 
+                184   ; Load upper ratio
+                185   Load_y(%1)
+                186   	lcall mul32
+                187   	
+                188   ; Load lower ratio
+                189   Load_y(%2)
+                190   	lcall div32
+                191   ; compute value for reload
+                192   ; reload rate = CLK/freq
+                193   	Load_y(CLK)
+                194   	lcall xchg_xy
+                195   	
+                196   	lcall div32
+                197   	
+                198   ; reload value = 65536-x
+                199   	Load_y(65536)
+                200   	lcall xchg_xy
+                201   	lcall sub32
+                202   ; x now contains the reload value
+                203   ;debug_BCD
+                204   	mov RL0, x+0
+                205   	mov RH0, x+1
+                206   	
+                207   	setb TR0
+                208   	; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+                209   	mov R2, %3
+                210   	lcall Play_Note_Delay
+                211   	clr TR0
+                212   	Wait_Milli_Seconds(#20)
+                213   endmac
+038E            214   
+038E            215   ; Based on TEMPO of music?
+038E            216   ; Set based on the smallest time interval note.
+038E            217   ; Moderato is about (108)-120 bpm
+038E            218   ; a 16th note is worth 1/4 of a beat
+038E            219   ; at modrato, a 16th note is held for 138.8888 ms
+038E            220   Play_Note_Delay:
+038E C002       221            push AR2
+0390 7A8B       221            mov R2, #139
+0392 1202AF     221            lcall ?Wait_Milli_Seconds
+0395 D002       221            pop AR2
+0397 DAF5       222   djnz R2, Play_Note_Delay
+0399 22         223   ret
+039A            224   
+039A            225   Note_Stop:
+039A C28C       226            clr TR0
+039C C002       227            push AR2
+039E 7A32       227            mov R2, #50
+03A0 1202AF     227            lcall ?Wait_Milli_Seconds
+03A3 D002       227            pop AR2
+03A5 D28C       228            setb TR0
+03A7 22         229   ret
+03A8            230   
+03A8            231   ;---------------------------------;
+03A8            232   ; Main program loop               ;
+03A8            233   ;---------------------------------;  
+03A8            234   Startup:
+03A8            235       ; Initialize the hardware:
+03A8 75817F     236       mov SP, #7FH
+03AB 120372     237       lcall InitTimer0
+03AE D2AF       238       setb EA
+03B0 C0E0       239            push acc
+03B2 7401       239            mov a, #1
+03B4 14         239            dec a
+03B5 120333     239            lcall ?Set_Cursor_2 ; Select column and row
+03B8 D0E0       239            pop acc
+03BA C083       240            push dph
+03BC C082       240            push dpl
+03BE C0E0       240            push acc
+03C0 900350     240            mov dptr, #initial_message1
+03C3 120328     240            lcall ?Send_Constant_String
+03C6 D0E0       240            pop acc
+03C8 D082       240            pop dpl
+03CA D083       240            pop dph
+03CC C0E0       241            push acc
+03CE 7401       241            mov a, #1
+03D0 14         241            dec a
+03D1 120335     241            lcall ?Set_Cursor_1 ; Select column and row
+03D4 D0E0       241            pop acc
+03D6 C083       242            push dph
+03D8 C082       242            push dpl
+03DA C0E0       242            push acc
+03DC 900361     242            mov dptr, #blank_message
+03DF 120328     242            lcall ?Send_Constant_String
+03E2 D0E0       242            pop acc
+03E4 D082       242            pop dpl
+03E6 D083       242            pop dph
+03E8            243            
+03E8            244   forever:
+03E8            245            ;lcall Note_Stop
+03E8            246            ; Compute the reload value given the base frequency and interval ratio codes
+03E8            246   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+03E8            246   ;Calc_Interval:
+03E8            246   ; Freq0 loaded (fundamental frequency)
+03E8 753070     246            mov x+0, #low (key_A5 % 0x10000) 
+03EB 753103     246            mov x+1, #high(key_A5 % 0x10000) 
+03EE 753200     246            mov x+2, #low (key_A5 / 0x10000) 
+03F1 753300     246            mov x+3, #high(key_A5 / 0x10000)  
+03F4            246   ; Load upper ratio
+03F4 753401     246            mov y+0, #low (tone_p1a % 0x10000) 
+03F7 753500     246            mov y+1, #high(tone_p1a % 0x10000) 
+03FA 753600     246            mov y+2, #low (tone_p1a / 0x10000) 
+03FD 753700     246            mov y+3, #high(tone_p1a / 0x10000) 
+0400 120188     246            lcall mul32
+0403            246            
+0403            246   ; Load lower ratio
+0403 753401     246            mov y+0, #low (tone_p1b % 0x10000) 
+0406 753500     246            mov y+1, #high(tone_p1b % 0x10000) 
+0409 753600     246            mov y+2, #low (tone_p1b / 0x10000) 
+040C 753700     246            mov y+3, #high(tone_p1b / 0x10000) 
+040F 120215     246            lcall div32
+0412            246   ; compute value for reload
+0412            246   ; reload rate = CLK/freq
+0412 753400     246            mov y+0, #low (CLK % 0x10000) 
+0415 753580     246            mov y+1, #high(CLK % 0x10000) 
+0418 753651     246            mov y+2, #low (CLK / 0x10000) 
+041B 753701     246            mov y+3, #high(CLK / 0x10000) 
+041E 12028B     246            lcall xchg_xy
+0421            246            
+0421 120215     246            lcall div32
+0424            246            
+0424            246   ; reload value = 65536-x
+0424 753400     246            mov y+0, #low (65536 % 0x10000) 
+0427 753500     246            mov y+1, #high(65536 % 0x10000) 
+042A 753601     246            mov y+2, #low (65536 / 0x10000) 
+042D 753700     246            mov y+3, #high(65536 / 0x10000) 
+0430 12028B     246            lcall xchg_xy
+0433 1200F4     246            lcall sub32
+0436            246   ; x now contains the reload value
+0436            246   ;debug_BCD
+0436 8530F2     246            mov RL0, x+0
+0439 8531F4     246            mov RH0, x+1
+043C            246            
+043C D28C       246            setb TR0
+043E            246            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+043E 7A04       246            mov R2, #4
+0440 12038E     246            lcall Play_Note_Delay
+0443 C28C       246            clr TR0
+0445 C002       246            push AR2
+0447 7A14       246            mov R2, #20
+0449 1202AF     246            lcall ?Wait_Milli_Seconds
+044C D002       246            pop AR2         ;A5
+044E            247            ; Compute the reload value given the base frequency and interval ratio codes
+044E            247   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+044E            247   ;Calc_Interval:
+044E            247   ; Freq0 loaded (fundamental frequency)
+044E 753070     247            mov x+0, #low (key_A5 % 0x10000) 
+0451 753103     247            mov x+1, #high(key_A5 % 0x10000) 
+0454 753200     247            mov x+2, #low (key_A5 / 0x10000) 
+0457 753300     247            mov x+3, #high(key_A5 / 0x10000)  
+045A            247   ; Load upper ratio
+045A 753401     247            mov y+0, #low (tone_p1a % 0x10000) 
+045D 753500     247            mov y+1, #high(tone_p1a % 0x10000) 
+0460 753600     247            mov y+2, #low (tone_p1a / 0x10000) 
+0463 753700     247            mov y+3, #high(tone_p1a / 0x10000) 
+0466 120188     247            lcall mul32
+0469            247            
+0469            247   ; Load lower ratio
+0469 753401     247            mov y+0, #low (tone_p1b % 0x10000) 
+046C 753500     247            mov y+1, #high(tone_p1b % 0x10000) 
+046F 753600     247            mov y+2, #low (tone_p1b / 0x10000) 
+0472 753700     247            mov y+3, #high(tone_p1b / 0x10000) 
+0475 120215     247            lcall div32
+0478            247   ; compute value for reload
+0478            247   ; reload rate = CLK/freq
+0478 753400     247            mov y+0, #low (CLK % 0x10000) 
+047B 753580     247            mov y+1, #high(CLK % 0x10000) 
+047E 753651     247            mov y+2, #low (CLK / 0x10000) 
+0481 753701     247            mov y+3, #high(CLK / 0x10000) 
+0484 12028B     247            lcall xchg_xy
+0487            247            
+0487 120215     247            lcall div32
+048A            247            
+048A            247   ; reload value = 65536-x
+048A 753400     247            mov y+0, #low (65536 % 0x10000) 
+048D 753500     247            mov y+1, #high(65536 % 0x10000) 
+0490 753601     247            mov y+2, #low (65536 / 0x10000) 
+0493 753700     247            mov y+3, #high(65536 / 0x10000) 
+0496 12028B     247            lcall xchg_xy
+0499 1200F4     247            lcall sub32
+049C            247   ; x now contains the reload value
+049C            247   ;debug_BCD
+049C 8530F2     247            mov RL0, x+0
+049F 8531F4     247            mov RH0, x+1
+04A2            247            
+04A2 D28C       247            setb TR0
+04A4            247            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+04A4 7A04       247            mov R2, #4
+04A6 12038E     247            lcall Play_Note_Delay
+04A9 C28C       247            clr TR0
+04AB C002       247            push AR2
+04AD 7A14       247            mov R2, #20
+04AF 1202AF     247            lcall ?Wait_Milli_Seconds
+04B2 D002       247            pop AR2         ;A5
+04B4            248            ; Compute the reload value given the base frequency and interval ratio codes
+04B4            248   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+04B4            248   ;Calc_Interval:
+04B4            248   ; Freq0 loaded (fundamental frequency)
+04B4 753070     248            mov x+0, #low (key_A5 % 0x10000) 
+04B7 753103     248            mov x+1, #high(key_A5 % 0x10000) 
+04BA 753200     248            mov x+2, #low (key_A5 / 0x10000) 
+04BD 753300     248            mov x+3, #high(key_A5 / 0x10000)  
+04C0            248   ; Load upper ratio
+04C0 753403     248            mov y+0, #low (tone_p5a % 0x10000) 
+04C3 753500     248            mov y+1, #high(tone_p5a % 0x10000) 
+04C6 753600     248            mov y+2, #low (tone_p5a / 0x10000) 
+04C9 753700     248            mov y+3, #high(tone_p5a / 0x10000) 
+04CC 120188     248            lcall mul32
+04CF            248            
+04CF            248   ; Load lower ratio
+04CF 753402     248            mov y+0, #low (tone_p5b % 0x10000) 
+04D2 753500     248            mov y+1, #high(tone_p5b % 0x10000) 
+04D5 753600     248            mov y+2, #low (tone_p5b / 0x10000) 
+04D8 753700     248            mov y+3, #high(tone_p5b / 0x10000) 
+04DB 120215     248            lcall div32
+04DE            248   ; compute value for reload
+04DE            248   ; reload rate = CLK/freq
+04DE 753400     248            mov y+0, #low (CLK % 0x10000) 
+04E1 753580     248            mov y+1, #high(CLK % 0x10000) 
+04E4 753651     248            mov y+2, #low (CLK / 0x10000) 
+04E7 753701     248            mov y+3, #high(CLK / 0x10000) 
+04EA 12028B     248            lcall xchg_xy
+04ED            248            
+04ED 120215     248            lcall div32
+04F0            248            
+04F0            248   ; reload value = 65536-x
+04F0 753400     248            mov y+0, #low (65536 % 0x10000) 
+04F3 753500     248            mov y+1, #high(65536 % 0x10000) 
+04F6 753601     248            mov y+2, #low (65536 / 0x10000) 
+04F9 753700     248            mov y+3, #high(65536 / 0x10000) 
+04FC 12028B     248            lcall xchg_xy
+04FF 1200F4     248            lcall sub32
+0502            248   ; x now contains the reload value
+0502            248   ;debug_BCD
+0502 8530F2     248            mov RL0, x+0
+0505 8531F4     248            mov RH0, x+1
+0508            248            
+0508 D28C       248            setb TR0
+050A            248            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+050A 7A04       248            mov R2, #4
+050C 12038E     248            lcall Play_Note_Delay
+050F C28C       248            clr TR0
+0511 C002       248            push AR2
+0513 7A14       248            mov R2, #20
+0515 1202AF     248            lcall ?Wait_Milli_Seconds
+0518 D002       248            pop AR2         ;E5
+051A            249            ; Compute the reload value given the base frequency and interval ratio codes
+051A            249   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+051A            249   ;Calc_Interval:
+051A            249   ; Freq0 loaded (fundamental frequency)
+051A 753070     249            mov x+0, #low (key_A5 % 0x10000) 
+051D 753103     249            mov x+1, #high(key_A5 % 0x10000) 
+0520 753200     249            mov x+2, #low (key_A5 / 0x10000) 
+0523 753300     249            mov x+3, #high(key_A5 / 0x10000)  
+0526            249   ; Load upper ratio
+0526 753403     249            mov y+0, #low (tone_p5a % 0x10000) 
+0529 753500     249            mov y+1, #high(tone_p5a % 0x10000) 
+052C 753600     249            mov y+2, #low (tone_p5a / 0x10000) 
+052F 753700     249            mov y+3, #high(tone_p5a / 0x10000) 
+0532 120188     249            lcall mul32
+0535            249            
+0535            249   ; Load lower ratio
+0535 753402     249            mov y+0, #low (tone_p5b % 0x10000) 
+0538 753500     249            mov y+1, #high(tone_p5b % 0x10000) 
+053B 753600     249            mov y+2, #low (tone_p5b / 0x10000) 
+053E 753700     249            mov y+3, #high(tone_p5b / 0x10000) 
+0541 120215     249            lcall div32
+0544            249   ; compute value for reload
+0544            249   ; reload rate = CLK/freq
+0544 753400     249            mov y+0, #low (CLK % 0x10000) 
+0547 753580     249            mov y+1, #high(CLK % 0x10000) 
+054A 753651     249            mov y+2, #low (CLK / 0x10000) 
+054D 753701     249            mov y+3, #high(CLK / 0x10000) 
+0550 12028B     249            lcall xchg_xy
+0553            249            
+0553 120215     249            lcall div32
+0556            249            
+0556            249   ; reload value = 65536-x
+0556 753400     249            mov y+0, #low (65536 % 0x10000) 
+0559 753500     249            mov y+1, #high(65536 % 0x10000) 
+055C 753601     249            mov y+2, #low (65536 / 0x10000) 
+055F 753700     249            mov y+3, #high(65536 / 0x10000) 
+0562 12028B     249            lcall xchg_xy
+0565 1200F4     249            lcall sub32
+0568            249   ; x now contains the reload value
+0568            249   ;debug_BCD
+0568 8530F2     249            mov RL0, x+0
+056B 8531F4     249            mov RH0, x+1
+056E            249            
+056E D28C       249            setb TR0
+0570            249            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0570 7A04       249            mov R2, #4
+0572 12038E     249            lcall Play_Note_Delay
+0575 C28C       249            clr TR0
+0577 C002       249            push AR2
+0579 7A14       249            mov R2, #20
+057B 1202AF     249            lcall ?Wait_Milli_Seconds
+057E D002       249            pop AR2         ;E5
+0580            250            
+0580            251            ; Compute the reload value given the base frequency and interval ratio codes
+0580            251   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0580            251   ;Calc_Interval:
+0580            251   ; Freq0 loaded (fundamental frequency)
+0580 753070     251            mov x+0, #low (key_A5 % 0x10000) 
+0583 753103     251            mov x+1, #high(key_A5 % 0x10000) 
+0586 753200     251            mov x+2, #low (key_A5 / 0x10000) 
+0589 753300     251            mov x+3, #high(key_A5 / 0x10000)  
+058C            251   ; Load upper ratio
+058C 753405     251            mov y+0, #low (tone_ma6a % 0x10000) 
+058F 753500     251            mov y+1, #high(tone_ma6a % 0x10000) 
+0592 753600     251            mov y+2, #low (tone_ma6a / 0x10000) 
+0595 753700     251            mov y+3, #high(tone_ma6a / 0x10000) 
+0598 120188     251            lcall mul32
+059B            251            
+059B            251   ; Load lower ratio
+059B 753403     251            mov y+0, #low (tone_ma6b % 0x10000) 
+059E 753500     251            mov y+1, #high(tone_ma6b % 0x10000) 
+05A1 753600     251            mov y+2, #low (tone_ma6b / 0x10000) 
+05A4 753700     251            mov y+3, #high(tone_ma6b / 0x10000) 
+05A7 120215     251            lcall div32
+05AA            251   ; compute value for reload
+05AA            251   ; reload rate = CLK/freq
+05AA 753400     251            mov y+0, #low (CLK % 0x10000) 
+05AD 753580     251            mov y+1, #high(CLK % 0x10000) 
+05B0 753651     251            mov y+2, #low (CLK / 0x10000) 
+05B3 753701     251            mov y+3, #high(CLK / 0x10000) 
+05B6 12028B     251            lcall xchg_xy
+05B9            251            
+05B9 120215     251            lcall div32
+05BC            251            
+05BC            251   ; reload value = 65536-x
+05BC 753400     251            mov y+0, #low (65536 % 0x10000) 
+05BF 753500     251            mov y+1, #high(65536 % 0x10000) 
+05C2 753601     251            mov y+2, #low (65536 / 0x10000) 
+05C5 753700     251            mov y+3, #high(65536 / 0x10000) 
+05C8 12028B     251            lcall xchg_xy
+05CB 1200F4     251            lcall sub32
+05CE            251   ; x now contains the reload value
+05CE            251   ;debug_BCD
+05CE 8530F2     251            mov RL0, x+0
+05D1 8531F4     251            mov RH0, x+1
+05D4            251            
+05D4 D28C       251            setb TR0
+05D6            251            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+05D6 7A04       251            mov R2, #4
+05D8 12038E     251            lcall Play_Note_Delay
+05DB C28C       251            clr TR0
+05DD C002       251            push AR2
+05DF 7A14       251            mov R2, #20
+05E1 1202AF     251            lcall ?Wait_Milli_Seconds
+05E4 D002       251            pop AR2         ;F5
+05E6            252            ; Compute the reload value given the base frequency and interval ratio codes
+05E6            252   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+05E6            252   ;Calc_Interval:
+05E6            252   ; Freq0 loaded (fundamental frequency)
+05E6 753070     252            mov x+0, #low (key_A5 % 0x10000) 
+05E9 753103     252            mov x+1, #high(key_A5 % 0x10000) 
+05EC 753200     252            mov x+2, #low (key_A5 / 0x10000) 
+05EF 753300     252            mov x+3, #high(key_A5 / 0x10000)  
+05F2            252   ; Load upper ratio
+05F2 753405     252            mov y+0, #low (tone_ma6a % 0x10000) 
+05F5 753500     252            mov y+1, #high(tone_ma6a % 0x10000) 
+05F8 753600     252            mov y+2, #low (tone_ma6a / 0x10000) 
+05FB 753700     252            mov y+3, #high(tone_ma6a / 0x10000) 
+05FE 120188     252            lcall mul32
+0601            252            
+0601            252   ; Load lower ratio
+0601 753403     252            mov y+0, #low (tone_ma6b % 0x10000) 
+0604 753500     252            mov y+1, #high(tone_ma6b % 0x10000) 
+0607 753600     252            mov y+2, #low (tone_ma6b / 0x10000) 
+060A 753700     252            mov y+3, #high(tone_ma6b / 0x10000) 
+060D 120215     252            lcall div32
+0610            252   ; compute value for reload
+0610            252   ; reload rate = CLK/freq
+0610 753400     252            mov y+0, #low (CLK % 0x10000) 
+0613 753580     252            mov y+1, #high(CLK % 0x10000) 
+0616 753651     252            mov y+2, #low (CLK / 0x10000) 
+0619 753701     252            mov y+3, #high(CLK / 0x10000) 
+061C 12028B     252            lcall xchg_xy
+061F            252            
+061F 120215     252            lcall div32
+0622            252            
+0622            252   ; reload value = 65536-x
+0622 753400     252            mov y+0, #low (65536 % 0x10000) 
+0625 753500     252            mov y+1, #high(65536 % 0x10000) 
+0628 753601     252            mov y+2, #low (65536 / 0x10000) 
+062B 753700     252            mov y+3, #high(65536 / 0x10000) 
+062E 12028B     252            lcall xchg_xy
+0631 1200F4     252            lcall sub32
+0634            252   ; x now contains the reload value
+0634            252   ;debug_BCD
+0634 8530F2     252            mov RL0, x+0
+0637 8531F4     252            mov RH0, x+1
+063A            252            
+063A D28C       252            setb TR0
+063C            252            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+063C 7A04       252            mov R2, #4
+063E 12038E     252            lcall Play_Note_Delay
+0641 C28C       252            clr TR0
+0643 C002       252            push AR2
+0645 7A14       252            mov R2, #20
+0647 1202AF     252            lcall ?Wait_Milli_Seconds
+064A D002       252            pop AR2         ;F5
+064C            253            ; Compute the reload value given the base frequency and interval ratio codes
+064C            253   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+064C            253   ;Calc_Interval:
+064C            253   ; Freq0 loaded (fundamental frequency)
+064C 753070     253            mov x+0, #low (key_A5 % 0x10000) 
+064F 753103     253            mov x+1, #high(key_A5 % 0x10000) 
+0652 753200     253            mov x+2, #low (key_A5 / 0x10000) 
+0655 753300     253            mov x+3, #high(key_A5 / 0x10000)  
+0658            253   ; Load upper ratio
+0658 753403     253            mov y+0, #low (tone_p5a % 0x10000) 
+065B 753500     253            mov y+1, #high(tone_p5a % 0x10000) 
+065E 753600     253            mov y+2, #low (tone_p5a / 0x10000) 
+0661 753700     253            mov y+3, #high(tone_p5a / 0x10000) 
+0664 120188     253            lcall mul32
+0667            253            
+0667            253   ; Load lower ratio
+0667 753402     253            mov y+0, #low (tone_p5b % 0x10000) 
+066A 753500     253            mov y+1, #high(tone_p5b % 0x10000) 
+066D 753600     253            mov y+2, #low (tone_p5b / 0x10000) 
+0670 753700     253            mov y+3, #high(tone_p5b / 0x10000) 
+0673 120215     253            lcall div32
+0676            253   ; compute value for reload
+0676            253   ; reload rate = CLK/freq
+0676 753400     253            mov y+0, #low (CLK % 0x10000) 
+0679 753580     253            mov y+1, #high(CLK % 0x10000) 
+067C 753651     253            mov y+2, #low (CLK / 0x10000) 
+067F 753701     253            mov y+3, #high(CLK / 0x10000) 
+0682 12028B     253            lcall xchg_xy
+0685            253            
+0685 120215     253            lcall div32
+0688            253            
+0688            253   ; reload value = 65536-x
+0688 753400     253            mov y+0, #low (65536 % 0x10000) 
+068B 753500     253            mov y+1, #high(65536 % 0x10000) 
+068E 753601     253            mov y+2, #low (65536 / 0x10000) 
+0691 753700     253            mov y+3, #high(65536 / 0x10000) 
+0694 12028B     253            lcall xchg_xy
+0697 1200F4     253            lcall sub32
+069A            253   ; x now contains the reload value
+069A            253   ;debug_BCD
+069A 8530F2     253            mov RL0, x+0
+069D 8531F4     253            mov RH0, x+1
+06A0            253            
+06A0 D28C       253            setb TR0
+06A2            253            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+06A2 7A08       253            mov R2, #8
+06A4 12038E     253            lcall Play_Note_Delay
+06A7 C28C       253            clr TR0
+06A9 C002       253            push AR2
+06AB 7A14       253            mov R2, #20
+06AD 1202AF     253            lcall ?Wait_Milli_Seconds
+06B0 D002       253            pop AR2         ;E5
+06B2            254            
+06B2            255            ; Compute the reload value given the base frequency and interval ratio codes
+06B2            255   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+06B2            255   ;Calc_Interval:
+06B2            255   ; Freq0 loaded (fundamental frequency)
+06B2 753070     255            mov x+0, #low (key_A5 % 0x10000) 
+06B5 753103     255            mov x+1, #high(key_A5 % 0x10000) 
+06B8 753200     255            mov x+2, #low (key_A5 / 0x10000) 
+06BB 753300     255            mov x+3, #high(key_A5 / 0x10000)  
+06BE            255   ; Load upper ratio
+06BE 753404     255            mov y+0, #low (tone_p4a % 0x10000) 
+06C1 753500     255            mov y+1, #high(tone_p4a % 0x10000) 
+06C4 753600     255            mov y+2, #low (tone_p4a / 0x10000) 
+06C7 753700     255            mov y+3, #high(tone_p4a / 0x10000) 
+06CA 120188     255            lcall mul32
+06CD            255            
+06CD            255   ; Load lower ratio
+06CD 753403     255            mov y+0, #low (tone_p4b % 0x10000) 
+06D0 753500     255            mov y+1, #high(tone_p4b % 0x10000) 
+06D3 753600     255            mov y+2, #low (tone_p4b / 0x10000) 
+06D6 753700     255            mov y+3, #high(tone_p4b / 0x10000) 
+06D9 120215     255            lcall div32
+06DC            255   ; compute value for reload
+06DC            255   ; reload rate = CLK/freq
+06DC 753400     255            mov y+0, #low (CLK % 0x10000) 
+06DF 753580     255            mov y+1, #high(CLK % 0x10000) 
+06E2 753651     255            mov y+2, #low (CLK / 0x10000) 
+06E5 753701     255            mov y+3, #high(CLK / 0x10000) 
+06E8 12028B     255            lcall xchg_xy
+06EB            255            
+06EB 120215     255            lcall div32
+06EE            255            
+06EE            255   ; reload value = 65536-x
+06EE 753400     255            mov y+0, #low (65536 % 0x10000) 
+06F1 753500     255            mov y+1, #high(65536 % 0x10000) 
+06F4 753601     255            mov y+2, #low (65536 / 0x10000) 
+06F7 753700     255            mov y+3, #high(65536 / 0x10000) 
+06FA 12028B     255            lcall xchg_xy
+06FD 1200F4     255            lcall sub32
+0700            255   ; x now contains the reload value
+0700            255   ;debug_BCD
+0700 8530F2     255            mov RL0, x+0
+0703 8531F4     255            mov RH0, x+1
+0706            255            
+0706 D28C       255            setb TR0
+0708            255            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0708 7A04       255            mov R2, #4
+070A 12038E     255            lcall Play_Note_Delay
+070D C28C       255            clr TR0
+070F C002       255            push AR2
+0711 7A14       255            mov R2, #20
+0713 1202AF     255            lcall ?Wait_Milli_Seconds
+0716 D002       255            pop AR2         ;D5
+0718            256            ; Compute the reload value given the base frequency and interval ratio codes
+0718            256   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0718            256   ;Calc_Interval:
+0718            256   ; Freq0 loaded (fundamental frequency)
+0718 753070     256            mov x+0, #low (key_A5 % 0x10000) 
+071B 753103     256            mov x+1, #high(key_A5 % 0x10000) 
+071E 753200     256            mov x+2, #low (key_A5 / 0x10000) 
+0721 753300     256            mov x+3, #high(key_A5 / 0x10000)  
+0724            256   ; Load upper ratio
+0724 753404     256            mov y+0, #low (tone_p4a % 0x10000) 
+0727 753500     256            mov y+1, #high(tone_p4a % 0x10000) 
+072A 753600     256            mov y+2, #low (tone_p4a / 0x10000) 
+072D 753700     256            mov y+3, #high(tone_p4a / 0x10000) 
+0730 120188     256            lcall mul32
+0733            256            
+0733            256   ; Load lower ratio
+0733 753403     256            mov y+0, #low (tone_p4b % 0x10000) 
+0736 753500     256            mov y+1, #high(tone_p4b % 0x10000) 
+0739 753600     256            mov y+2, #low (tone_p4b / 0x10000) 
+073C 753700     256            mov y+3, #high(tone_p4b / 0x10000) 
+073F 120215     256            lcall div32
+0742            256   ; compute value for reload
+0742            256   ; reload rate = CLK/freq
+0742 753400     256            mov y+0, #low (CLK % 0x10000) 
+0745 753580     256            mov y+1, #high(CLK % 0x10000) 
+0748 753651     256            mov y+2, #low (CLK / 0x10000) 
+074B 753701     256            mov y+3, #high(CLK / 0x10000) 
+074E 12028B     256            lcall xchg_xy
+0751            256            
+0751 120215     256            lcall div32
+0754            256            
+0754            256   ; reload value = 65536-x
+0754 753400     256            mov y+0, #low (65536 % 0x10000) 
+0757 753500     256            mov y+1, #high(65536 % 0x10000) 
+075A 753601     256            mov y+2, #low (65536 / 0x10000) 
+075D 753700     256            mov y+3, #high(65536 / 0x10000) 
+0760 12028B     256            lcall xchg_xy
+0763 1200F4     256            lcall sub32
+0766            256   ; x now contains the reload value
+0766            256   ;debug_BCD
+0766 8530F2     256            mov RL0, x+0
+0769 8531F4     256            mov RH0, x+1
+076C            256            
+076C D28C       256            setb TR0
+076E            256            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+076E 7A04       256            mov R2, #4
+0770 12038E     256            lcall Play_Note_Delay
+0773 C28C       256            clr TR0
+0775 C002       256            push AR2
+0777 7A14       256            mov R2, #20
+0779 1202AF     256            lcall ?Wait_Milli_Seconds
+077C D002       256            pop AR2         ;D5
+077E            257            ; Compute the reload value given the base frequency and interval ratio codes
+077E            257   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+077E            257   ;Calc_Interval:
+077E            257   ; Freq0 loaded (fundamental frequency)
+077E 753070     257            mov x+0, #low (key_A5 % 0x10000) 
+0781 753103     257            mov x+1, #high(key_A5 % 0x10000) 
+0784 753200     257            mov x+2, #low (key_A5 / 0x10000) 
+0787 753300     257            mov x+3, #high(key_A5 / 0x10000)  
+078A            257   ; Load upper ratio
+078A 753405     257            mov y+0, #low (tone_ma3a % 0x10000) 
+078D 753500     257            mov y+1, #high(tone_ma3a % 0x10000) 
+0790 753600     257            mov y+2, #low (tone_ma3a / 0x10000) 
+0793 753700     257            mov y+3, #high(tone_ma3a / 0x10000) 
+0796 120188     257            lcall mul32
+0799            257            
+0799            257   ; Load lower ratio
+0799 753404     257            mov y+0, #low (tone_ma3b % 0x10000) 
+079C 753500     257            mov y+1, #high(tone_ma3b % 0x10000) 
+079F 753600     257            mov y+2, #low (tone_ma3b / 0x10000) 
+07A2 753700     257            mov y+3, #high(tone_ma3b / 0x10000) 
+07A5 120215     257            lcall div32
+07A8            257   ; compute value for reload
+07A8            257   ; reload rate = CLK/freq
+07A8 753400     257            mov y+0, #low (CLK % 0x10000) 
+07AB 753580     257            mov y+1, #high(CLK % 0x10000) 
+07AE 753651     257            mov y+2, #low (CLK / 0x10000) 
+07B1 753701     257            mov y+3, #high(CLK / 0x10000) 
+07B4 12028B     257            lcall xchg_xy
+07B7            257            
+07B7 120215     257            lcall div32
+07BA            257            
+07BA            257   ; reload value = 65536-x
+07BA 753400     257            mov y+0, #low (65536 % 0x10000) 
+07BD 753500     257            mov y+1, #high(65536 % 0x10000) 
+07C0 753601     257            mov y+2, #low (65536 / 0x10000) 
+07C3 753700     257            mov y+3, #high(65536 / 0x10000) 
+07C6 12028B     257            lcall xchg_xy
+07C9 1200F4     257            lcall sub32
+07CC            257   ; x now contains the reload value
+07CC            257   ;debug_BCD
+07CC 8530F2     257            mov RL0, x+0
+07CF 8531F4     257            mov RH0, x+1
+07D2            257            
+07D2 D28C       257            setb TR0
+07D4            257            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+07D4 7A04       257            mov R2, #4
+07D6 12038E     257            lcall Play_Note_Delay
+07D9 C28C       257            clr TR0
+07DB C002       257            push AR2
+07DD 7A14       257            mov R2, #20
+07DF 1202AF     257            lcall ?Wait_Milli_Seconds
+07E2 D002       257            pop AR2         ;C5#
+07E4            258            ; Compute the reload value given the base frequency and interval ratio codes
+07E4            258   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+07E4            258   ;Calc_Interval:
+07E4            258   ; Freq0 loaded (fundamental frequency)
+07E4 753070     258            mov x+0, #low (key_A5 % 0x10000) 
+07E7 753103     258            mov x+1, #high(key_A5 % 0x10000) 
+07EA 753200     258            mov x+2, #low (key_A5 / 0x10000) 
+07ED 753300     258            mov x+3, #high(key_A5 / 0x10000)  
+07F0            258   ; Load upper ratio
+07F0 753405     258            mov y+0, #low (tone_ma3a % 0x10000) 
+07F3 753500     258            mov y+1, #high(tone_ma3a % 0x10000) 
+07F6 753600     258            mov y+2, #low (tone_ma3a / 0x10000) 
+07F9 753700     258            mov y+3, #high(tone_ma3a / 0x10000) 
+07FC 120188     258            lcall mul32
+07FF            258            
+07FF            258   ; Load lower ratio
+07FF 753404     258            mov y+0, #low (tone_ma3b % 0x10000) 
+0802 753500     258            mov y+1, #high(tone_ma3b % 0x10000) 
+0805 753600     258            mov y+2, #low (tone_ma3b / 0x10000) 
+0808 753700     258            mov y+3, #high(tone_ma3b / 0x10000) 
+080B 120215     258            lcall div32
+080E            258   ; compute value for reload
+080E            258   ; reload rate = CLK/freq
+080E 753400     258            mov y+0, #low (CLK % 0x10000) 
+0811 753580     258            mov y+1, #high(CLK % 0x10000) 
+0814 753651     258            mov y+2, #low (CLK / 0x10000) 
+0817 753701     258            mov y+3, #high(CLK / 0x10000) 
+081A 12028B     258            lcall xchg_xy
+081D            258            
+081D 120215     258            lcall div32
+0820            258            
+0820            258   ; reload value = 65536-x
+0820 753400     258            mov y+0, #low (65536 % 0x10000) 
+0823 753500     258            mov y+1, #high(65536 % 0x10000) 
+0826 753601     258            mov y+2, #low (65536 / 0x10000) 
+0829 753700     258            mov y+3, #high(65536 / 0x10000) 
+082C 12028B     258            lcall xchg_xy
+082F 1200F4     258            lcall sub32
+0832            258   ; x now contains the reload value
+0832            258   ;debug_BCD
+0832 8530F2     258            mov RL0, x+0
+0835 8531F4     258            mov RH0, x+1
+0838            258            
+0838 D28C       258            setb TR0
+083A            258            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+083A 7A04       258            mov R2, #4
+083C 12038E     258            lcall Play_Note_Delay
+083F C28C       258            clr TR0
+0841 C002       258            push AR2
+0843 7A14       258            mov R2, #20
+0845 1202AF     258            lcall ?Wait_Milli_Seconds
+0848 D002       258            pop AR2         ;C5#
+084A            259            
+084A            260            ; Compute the reload value given the base frequency and interval ratio codes
+084A            260   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+084A            260   ;Calc_Interval:
+084A            260   ; Freq0 loaded (fundamental frequency)
+084A 753070     260            mov x+0, #low (key_A5 % 0x10000) 
+084D 753103     260            mov x+1, #high(key_A5 % 0x10000) 
+0850 753200     260            mov x+2, #low (key_A5 / 0x10000) 
+0853 753300     260            mov x+3, #high(key_A5 / 0x10000)  
+0856            260   ; Load upper ratio
+0856 753409     260            mov y+0, #low (tone_ma2a % 0x10000) 
+0859 753500     260            mov y+1, #high(tone_ma2a % 0x10000) 
+085C 753600     260            mov y+2, #low (tone_ma2a / 0x10000) 
+085F 753700     260            mov y+3, #high(tone_ma2a / 0x10000) 
+0862 120188     260            lcall mul32
+0865            260            
+0865            260   ; Load lower ratio
+0865 753408     260            mov y+0, #low (tone_ma2b % 0x10000) 
+0868 753500     260            mov y+1, #high(tone_ma2b % 0x10000) 
+086B 753600     260            mov y+2, #low (tone_ma2b / 0x10000) 
+086E 753700     260            mov y+3, #high(tone_ma2b / 0x10000) 
+0871 120215     260            lcall div32
+0874            260   ; compute value for reload
+0874            260   ; reload rate = CLK/freq
+0874 753400     260            mov y+0, #low (CLK % 0x10000) 
+0877 753580     260            mov y+1, #high(CLK % 0x10000) 
+087A 753651     260            mov y+2, #low (CLK / 0x10000) 
+087D 753701     260            mov y+3, #high(CLK / 0x10000) 
+0880 12028B     260            lcall xchg_xy
+0883            260            
+0883 120215     260            lcall div32
+0886            260            
+0886            260   ; reload value = 65536-x
+0886 753400     260            mov y+0, #low (65536 % 0x10000) 
+0889 753500     260            mov y+1, #high(65536 % 0x10000) 
+088C 753601     260            mov y+2, #low (65536 / 0x10000) 
+088F 753700     260            mov y+3, #high(65536 / 0x10000) 
+0892 12028B     260            lcall xchg_xy
+0895 1200F4     260            lcall sub32
+0898            260   ; x now contains the reload value
+0898            260   ;debug_BCD
+0898 8530F2     260            mov RL0, x+0
+089B 8531F4     260            mov RH0, x+1
+089E            260            
+089E D28C       260            setb TR0
+08A0            260            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+08A0 7A04       260            mov R2, #4
+08A2 12038E     260            lcall Play_Note_Delay
+08A5 C28C       260            clr TR0
+08A7 C002       260            push AR2
+08A9 7A14       260            mov R2, #20
+08AB 1202AF     260            lcall ?Wait_Milli_Seconds
+08AE D002       260            pop AR2         ;B5
+08B0            261            ; Compute the reload value given the base frequency and interval ratio codes
+08B0            261   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+08B0            261   ;Calc_Interval:
+08B0            261   ; Freq0 loaded (fundamental frequency)
+08B0 753070     261            mov x+0, #low (key_A5 % 0x10000) 
+08B3 753103     261            mov x+1, #high(key_A5 % 0x10000) 
+08B6 753200     261            mov x+2, #low (key_A5 / 0x10000) 
+08B9 753300     261            mov x+3, #high(key_A5 / 0x10000)  
+08BC            261   ; Load upper ratio
+08BC 753409     261            mov y+0, #low (tone_ma2a % 0x10000) 
+08BF 753500     261            mov y+1, #high(tone_ma2a % 0x10000) 
+08C2 753600     261            mov y+2, #low (tone_ma2a / 0x10000) 
+08C5 753700     261            mov y+3, #high(tone_ma2a / 0x10000) 
+08C8 120188     261            lcall mul32
+08CB            261            
+08CB            261   ; Load lower ratio
+08CB 753408     261            mov y+0, #low (tone_ma2b % 0x10000) 
+08CE 753500     261            mov y+1, #high(tone_ma2b % 0x10000) 
+08D1 753600     261            mov y+2, #low (tone_ma2b / 0x10000) 
+08D4 753700     261            mov y+3, #high(tone_ma2b / 0x10000) 
+08D7 120215     261            lcall div32
+08DA            261   ; compute value for reload
+08DA            261   ; reload rate = CLK/freq
+08DA 753400     261            mov y+0, #low (CLK % 0x10000) 
+08DD 753580     261            mov y+1, #high(CLK % 0x10000) 
+08E0 753651     261            mov y+2, #low (CLK / 0x10000) 
+08E3 753701     261            mov y+3, #high(CLK / 0x10000) 
+08E6 12028B     261            lcall xchg_xy
+08E9            261            
+08E9 120215     261            lcall div32
+08EC            261            
+08EC            261   ; reload value = 65536-x
+08EC 753400     261            mov y+0, #low (65536 % 0x10000) 
+08EF 753500     261            mov y+1, #high(65536 % 0x10000) 
+08F2 753601     261            mov y+2, #low (65536 / 0x10000) 
+08F5 753700     261            mov y+3, #high(65536 / 0x10000) 
+08F8 12028B     261            lcall xchg_xy
+08FB 1200F4     261            lcall sub32
+08FE            261   ; x now contains the reload value
+08FE            261   ;debug_BCD
+08FE 8530F2     261            mov RL0, x+0
+0901 8531F4     261            mov RH0, x+1
+0904            261            
+0904 D28C       261            setb TR0
+0906            261            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0906 7A04       261            mov R2, #4
+0908 12038E     261            lcall Play_Note_Delay
+090B C28C       261            clr TR0
+090D C002       261            push AR2
+090F 7A14       261            mov R2, #20
+0911 1202AF     261            lcall ?Wait_Milli_Seconds
+0914 D002       261            pop AR2         ;B5
+0916            262            ; Compute the reload value given the base frequency and interval ratio codes
+0916            262   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0916            262   ;Calc_Interval:
+0916            262   ; Freq0 loaded (fundamental frequency)
+0916 753070     262            mov x+0, #low (key_A5 % 0x10000) 
+0919 753103     262            mov x+1, #high(key_A5 % 0x10000) 
+091C 753200     262            mov x+2, #low (key_A5 / 0x10000) 
+091F 753300     262            mov x+3, #high(key_A5 / 0x10000)  
+0922            262   ; Load upper ratio
+0922 753401     262            mov y+0, #low (tone_p1a % 0x10000) 
+0925 753500     262            mov y+1, #high(tone_p1a % 0x10000) 
+0928 753600     262            mov y+2, #low (tone_p1a / 0x10000) 
+092B 753700     262            mov y+3, #high(tone_p1a / 0x10000) 
+092E 120188     262            lcall mul32
+0931            262            
+0931            262   ; Load lower ratio
+0931 753401     262            mov y+0, #low (tone_p1b % 0x10000) 
+0934 753500     262            mov y+1, #high(tone_p1b % 0x10000) 
+0937 753600     262            mov y+2, #low (tone_p1b / 0x10000) 
+093A 753700     262            mov y+3, #high(tone_p1b / 0x10000) 
+093D 120215     262            lcall div32
+0940            262   ; compute value for reload
+0940            262   ; reload rate = CLK/freq
+0940 753400     262            mov y+0, #low (CLK % 0x10000) 
+0943 753580     262            mov y+1, #high(CLK % 0x10000) 
+0946 753651     262            mov y+2, #low (CLK / 0x10000) 
+0949 753701     262            mov y+3, #high(CLK / 0x10000) 
+094C 12028B     262            lcall xchg_xy
+094F            262            
+094F 120215     262            lcall div32
+0952            262            
+0952            262   ; reload value = 65536-x
+0952 753400     262            mov y+0, #low (65536 % 0x10000) 
+0955 753500     262            mov y+1, #high(65536 % 0x10000) 
+0958 753601     262            mov y+2, #low (65536 / 0x10000) 
+095B 753700     262            mov y+3, #high(65536 / 0x10000) 
+095E 12028B     262            lcall xchg_xy
+0961 1200F4     262            lcall sub32
+0964            262   ; x now contains the reload value
+0964            262   ;debug_BCD
+0964 8530F2     262            mov RL0, x+0
+0967 8531F4     262            mov RH0, x+1
+096A            262            
+096A D28C       262            setb TR0
+096C            262            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+096C 7A08       262            mov R2, #8
+096E 12038E     262            lcall Play_Note_Delay
+0971 C28C       262            clr TR0
+0973 C002       262            push AR2
+0975 7A14       262            mov R2, #20
+0977 1202AF     262            lcall ?Wait_Milli_Seconds
+097A D002       262            pop AR2         ;A5
+097C            263            
+097C            264            ; Compute the reload value given the base frequency and interval ratio codes
+097C            264   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+097C            264   ;Calc_Interval:
+097C            264   ; Freq0 loaded (fundamental frequency)
+097C 753070     264            mov x+0, #low (key_A5 % 0x10000) 
+097F 753103     264            mov x+1, #high(key_A5 % 0x10000) 
+0982 753200     264            mov x+2, #low (key_A5 / 0x10000) 
+0985 753300     264            mov x+3, #high(key_A5 / 0x10000)  
+0988            264   ; Load upper ratio
+0988 753403     264            mov y+0, #low (tone_p5a % 0x10000) 
+098B 753500     264            mov y+1, #high(tone_p5a % 0x10000) 
+098E 753600     264            mov y+2, #low (tone_p5a / 0x10000) 
+0991 753700     264            mov y+3, #high(tone_p5a / 0x10000) 
+0994 120188     264            lcall mul32
+0997            264            
+0997            264   ; Load lower ratio
+0997 753402     264            mov y+0, #low (tone_p5b % 0x10000) 
+099A 753500     264            mov y+1, #high(tone_p5b % 0x10000) 
+099D 753600     264            mov y+2, #low (tone_p5b / 0x10000) 
+09A0 753700     264            mov y+3, #high(tone_p5b / 0x10000) 
+09A3 120215     264            lcall div32
+09A6            264   ; compute value for reload
+09A6            264   ; reload rate = CLK/freq
+09A6 753400     264            mov y+0, #low (CLK % 0x10000) 
+09A9 753580     264            mov y+1, #high(CLK % 0x10000) 
+09AC 753651     264            mov y+2, #low (CLK / 0x10000) 
+09AF 753701     264            mov y+3, #high(CLK / 0x10000) 
+09B2 12028B     264            lcall xchg_xy
+09B5            264            
+09B5 120215     264            lcall div32
+09B8            264            
+09B8            264   ; reload value = 65536-x
+09B8 753400     264            mov y+0, #low (65536 % 0x10000) 
+09BB 753500     264            mov y+1, #high(65536 % 0x10000) 
+09BE 753601     264            mov y+2, #low (65536 / 0x10000) 
+09C1 753700     264            mov y+3, #high(65536 / 0x10000) 
+09C4 12028B     264            lcall xchg_xy
+09C7 1200F4     264            lcall sub32
+09CA            264   ; x now contains the reload value
+09CA            264   ;debug_BCD
+09CA 8530F2     264            mov RL0, x+0
+09CD 8531F4     264            mov RH0, x+1
+09D0            264            
+09D0 D28C       264            setb TR0
+09D2            264            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+09D2 7A04       264            mov R2, #4
+09D4 12038E     264            lcall Play_Note_Delay
+09D7 C28C       264            clr TR0
+09D9 C002       264            push AR2
+09DB 7A14       264            mov R2, #20
+09DD 1202AF     264            lcall ?Wait_Milli_Seconds
+09E0 D002       264            pop AR2         ;E5
+09E2            265            ; Compute the reload value given the base frequency and interval ratio codes
+09E2            265   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+09E2            265   ;Calc_Interval:
+09E2            265   ; Freq0 loaded (fundamental frequency)
+09E2 753070     265            mov x+0, #low (key_A5 % 0x10000) 
+09E5 753103     265            mov x+1, #high(key_A5 % 0x10000) 
+09E8 753200     265            mov x+2, #low (key_A5 / 0x10000) 
+09EB 753300     265            mov x+3, #high(key_A5 / 0x10000)  
+09EE            265   ; Load upper ratio
+09EE 753403     265            mov y+0, #low (tone_p5a % 0x10000) 
+09F1 753500     265            mov y+1, #high(tone_p5a % 0x10000) 
+09F4 753600     265            mov y+2, #low (tone_p5a / 0x10000) 
+09F7 753700     265            mov y+3, #high(tone_p5a / 0x10000) 
+09FA 120188     265            lcall mul32
+09FD            265            
+09FD            265   ; Load lower ratio
+09FD 753402     265            mov y+0, #low (tone_p5b % 0x10000) 
+0A00 753500     265            mov y+1, #high(tone_p5b % 0x10000) 
+0A03 753600     265            mov y+2, #low (tone_p5b / 0x10000) 
+0A06 753700     265            mov y+3, #high(tone_p5b / 0x10000) 
+0A09 120215     265            lcall div32
+0A0C            265   ; compute value for reload
+0A0C            265   ; reload rate = CLK/freq
+0A0C 753400     265            mov y+0, #low (CLK % 0x10000) 
+0A0F 753580     265            mov y+1, #high(CLK % 0x10000) 
+0A12 753651     265            mov y+2, #low (CLK / 0x10000) 
+0A15 753701     265            mov y+3, #high(CLK / 0x10000) 
+0A18 12028B     265            lcall xchg_xy
+0A1B            265            
+0A1B 120215     265            lcall div32
+0A1E            265            
+0A1E            265   ; reload value = 65536-x
+0A1E 753400     265            mov y+0, #low (65536 % 0x10000) 
+0A21 753500     265            mov y+1, #high(65536 % 0x10000) 
+0A24 753601     265            mov y+2, #low (65536 / 0x10000) 
+0A27 753700     265            mov y+3, #high(65536 / 0x10000) 
+0A2A 12028B     265            lcall xchg_xy
+0A2D 1200F4     265            lcall sub32
+0A30            265   ; x now contains the reload value
+0A30            265   ;debug_BCD
+0A30 8530F2     265            mov RL0, x+0
+0A33 8531F4     265            mov RH0, x+1
+0A36            265            
+0A36 D28C       265            setb TR0
+0A38            265            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0A38 7A04       265            mov R2, #4
+0A3A 12038E     265            lcall Play_Note_Delay
+0A3D C28C       265            clr TR0
+0A3F C002       265            push AR2
+0A41 7A14       265            mov R2, #20
+0A43 1202AF     265            lcall ?Wait_Milli_Seconds
+0A46 D002       265            pop AR2         ;E5
+0A48            266            ; Compute the reload value given the base frequency and interval ratio codes
+0A48            266   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0A48            266   ;Calc_Interval:
+0A48            266   ; Freq0 loaded (fundamental frequency)
+0A48 753070     266            mov x+0, #low (key_A5 % 0x10000) 
+0A4B 753103     266            mov x+1, #high(key_A5 % 0x10000) 
+0A4E 753200     266            mov x+2, #low (key_A5 / 0x10000) 
+0A51 753300     266            mov x+3, #high(key_A5 / 0x10000)  
+0A54            266   ; Load upper ratio
+0A54 753404     266            mov y+0, #low (tone_p4a % 0x10000) 
+0A57 753500     266            mov y+1, #high(tone_p4a % 0x10000) 
+0A5A 753600     266            mov y+2, #low (tone_p4a / 0x10000) 
+0A5D 753700     266            mov y+3, #high(tone_p4a / 0x10000) 
+0A60 120188     266            lcall mul32
+0A63            266            
+0A63            266   ; Load lower ratio
+0A63 753403     266            mov y+0, #low (tone_p4b % 0x10000) 
+0A66 753500     266            mov y+1, #high(tone_p4b % 0x10000) 
+0A69 753600     266            mov y+2, #low (tone_p4b / 0x10000) 
+0A6C 753700     266            mov y+3, #high(tone_p4b / 0x10000) 
+0A6F 120215     266            lcall div32
+0A72            266   ; compute value for reload
+0A72            266   ; reload rate = CLK/freq
+0A72 753400     266            mov y+0, #low (CLK % 0x10000) 
+0A75 753580     266            mov y+1, #high(CLK % 0x10000) 
+0A78 753651     266            mov y+2, #low (CLK / 0x10000) 
+0A7B 753701     266            mov y+3, #high(CLK / 0x10000) 
+0A7E 12028B     266            lcall xchg_xy
+0A81            266            
+0A81 120215     266            lcall div32
+0A84            266            
+0A84            266   ; reload value = 65536-x
+0A84 753400     266            mov y+0, #low (65536 % 0x10000) 
+0A87 753500     266            mov y+1, #high(65536 % 0x10000) 
+0A8A 753601     266            mov y+2, #low (65536 / 0x10000) 
+0A8D 753700     266            mov y+3, #high(65536 / 0x10000) 
+0A90 12028B     266            lcall xchg_xy
+0A93 1200F4     266            lcall sub32
+0A96            266   ; x now contains the reload value
+0A96            266   ;debug_BCD
+0A96 8530F2     266            mov RL0, x+0
+0A99 8531F4     266            mov RH0, x+1
+0A9C            266            
+0A9C D28C       266            setb TR0
+0A9E            266            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0A9E 7A04       266            mov R2, #4
+0AA0 12038E     266            lcall Play_Note_Delay
+0AA3 C28C       266            clr TR0
+0AA5 C002       266            push AR2
+0AA7 7A14       266            mov R2, #20
+0AA9 1202AF     266            lcall ?Wait_Milli_Seconds
+0AAC D002       266            pop AR2         ;D5
+0AAE            267            ; Compute the reload value given the base frequency and interval ratio codes
+0AAE            267   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0AAE            267   ;Calc_Interval:
+0AAE            267   ; Freq0 loaded (fundamental frequency)
+0AAE 753070     267            mov x+0, #low (key_A5 % 0x10000) 
+0AB1 753103     267            mov x+1, #high(key_A5 % 0x10000) 
+0AB4 753200     267            mov x+2, #low (key_A5 / 0x10000) 
+0AB7 753300     267            mov x+3, #high(key_A5 / 0x10000)  
+0ABA            267   ; Load upper ratio
+0ABA 753404     267            mov y+0, #low (tone_p4a % 0x10000) 
+0ABD 753500     267            mov y+1, #high(tone_p4a % 0x10000) 
+0AC0 753600     267            mov y+2, #low (tone_p4a / 0x10000) 
+0AC3 753700     267            mov y+3, #high(tone_p4a / 0x10000) 
+0AC6 120188     267            lcall mul32
+0AC9            267            
+0AC9            267   ; Load lower ratio
+0AC9 753403     267            mov y+0, #low (tone_p4b % 0x10000) 
+0ACC 753500     267            mov y+1, #high(tone_p4b % 0x10000) 
+0ACF 753600     267            mov y+2, #low (tone_p4b / 0x10000) 
+0AD2 753700     267            mov y+3, #high(tone_p4b / 0x10000) 
+0AD5 120215     267            lcall div32
+0AD8            267   ; compute value for reload
+0AD8            267   ; reload rate = CLK/freq
+0AD8 753400     267            mov y+0, #low (CLK % 0x10000) 
+0ADB 753580     267            mov y+1, #high(CLK % 0x10000) 
+0ADE 753651     267            mov y+2, #low (CLK / 0x10000) 
+0AE1 753701     267            mov y+3, #high(CLK / 0x10000) 
+0AE4 12028B     267            lcall xchg_xy
+0AE7            267            
+0AE7 120215     267            lcall div32
+0AEA            267            
+0AEA            267   ; reload value = 65536-x
+0AEA 753400     267            mov y+0, #low (65536 % 0x10000) 
+0AED 753500     267            mov y+1, #high(65536 % 0x10000) 
+0AF0 753601     267            mov y+2, #low (65536 / 0x10000) 
+0AF3 753700     267            mov y+3, #high(65536 / 0x10000) 
+0AF6 12028B     267            lcall xchg_xy
+0AF9 1200F4     267            lcall sub32
+0AFC            267   ; x now contains the reload value
+0AFC            267   ;debug_BCD
+0AFC 8530F2     267            mov RL0, x+0
+0AFF 8531F4     267            mov RH0, x+1
+0B02            267            
+0B02 D28C       267            setb TR0
+0B04            267            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0B04 7A04       267            mov R2, #4
+0B06 12038E     267            lcall Play_Note_Delay
+0B09 C28C       267            clr TR0
+0B0B C002       267            push AR2
+0B0D 7A14       267            mov R2, #20
+0B0F 1202AF     267            lcall ?Wait_Milli_Seconds
+0B12 D002       267            pop AR2         ;D5
+0B14            268            
+0B14            269            ; Compute the reload value given the base frequency and interval ratio codes
+0B14            269   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0B14            269   ;Calc_Interval:
+0B14            269   ; Freq0 loaded (fundamental frequency)
+0B14 753070     269            mov x+0, #low (key_A5 % 0x10000) 
+0B17 753103     269            mov x+1, #high(key_A5 % 0x10000) 
+0B1A 753200     269            mov x+2, #low (key_A5 / 0x10000) 
+0B1D 753300     269            mov x+3, #high(key_A5 / 0x10000)  
+0B20            269   ; Load upper ratio
+0B20 753405     269            mov y+0, #low (tone_ma3a % 0x10000) 
+0B23 753500     269            mov y+1, #high(tone_ma3a % 0x10000) 
+0B26 753600     269            mov y+2, #low (tone_ma3a / 0x10000) 
+0B29 753700     269            mov y+3, #high(tone_ma3a / 0x10000) 
+0B2C 120188     269            lcall mul32
+0B2F            269            
+0B2F            269   ; Load lower ratio
+0B2F 753404     269            mov y+0, #low (tone_ma3b % 0x10000) 
+0B32 753500     269            mov y+1, #high(tone_ma3b % 0x10000) 
+0B35 753600     269            mov y+2, #low (tone_ma3b / 0x10000) 
+0B38 753700     269            mov y+3, #high(tone_ma3b / 0x10000) 
+0B3B 120215     269            lcall div32
+0B3E            269   ; compute value for reload
+0B3E            269   ; reload rate = CLK/freq
+0B3E 753400     269            mov y+0, #low (CLK % 0x10000) 
+0B41 753580     269            mov y+1, #high(CLK % 0x10000) 
+0B44 753651     269            mov y+2, #low (CLK / 0x10000) 
+0B47 753701     269            mov y+3, #high(CLK / 0x10000) 
+0B4A 12028B     269            lcall xchg_xy
+0B4D            269            
+0B4D 120215     269            lcall div32
+0B50            269            
+0B50            269   ; reload value = 65536-x
+0B50 753400     269            mov y+0, #low (65536 % 0x10000) 
+0B53 753500     269            mov y+1, #high(65536 % 0x10000) 
+0B56 753601     269            mov y+2, #low (65536 / 0x10000) 
+0B59 753700     269            mov y+3, #high(65536 / 0x10000) 
+0B5C 12028B     269            lcall xchg_xy
+0B5F 1200F4     269            lcall sub32
+0B62            269   ; x now contains the reload value
+0B62            269   ;debug_BCD
+0B62 8530F2     269            mov RL0, x+0
+0B65 8531F4     269            mov RH0, x+1
+0B68            269            
+0B68 D28C       269            setb TR0
+0B6A            269            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0B6A 7A04       269            mov R2, #4
+0B6C 12038E     269            lcall Play_Note_Delay
+0B6F C28C       269            clr TR0
+0B71 C002       269            push AR2
+0B73 7A14       269            mov R2, #20
+0B75 1202AF     269            lcall ?Wait_Milli_Seconds
+0B78 D002       269            pop AR2         ;C5#
+0B7A            270            ; Compute the reload value given the base frequency and interval ratio codes
+0B7A            270   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0B7A            270   ;Calc_Interval:
+0B7A            270   ; Freq0 loaded (fundamental frequency)
+0B7A 753070     270            mov x+0, #low (key_A5 % 0x10000) 
+0B7D 753103     270            mov x+1, #high(key_A5 % 0x10000) 
+0B80 753200     270            mov x+2, #low (key_A5 / 0x10000) 
+0B83 753300     270            mov x+3, #high(key_A5 / 0x10000)  
+0B86            270   ; Load upper ratio
+0B86 753405     270            mov y+0, #low (tone_ma3a % 0x10000) 
+0B89 753500     270            mov y+1, #high(tone_ma3a % 0x10000) 
+0B8C 753600     270            mov y+2, #low (tone_ma3a / 0x10000) 
+0B8F 753700     270            mov y+3, #high(tone_ma3a / 0x10000) 
+0B92 120188     270            lcall mul32
+0B95            270            
+0B95            270   ; Load lower ratio
+0B95 753404     270            mov y+0, #low (tone_ma3b % 0x10000) 
+0B98 753500     270            mov y+1, #high(tone_ma3b % 0x10000) 
+0B9B 753600     270            mov y+2, #low (tone_ma3b / 0x10000) 
+0B9E 753700     270            mov y+3, #high(tone_ma3b / 0x10000) 
+0BA1 120215     270            lcall div32
+0BA4            270   ; compute value for reload
+0BA4            270   ; reload rate = CLK/freq
+0BA4 753400     270            mov y+0, #low (CLK % 0x10000) 
+0BA7 753580     270            mov y+1, #high(CLK % 0x10000) 
+0BAA 753651     270            mov y+2, #low (CLK / 0x10000) 
+0BAD 753701     270            mov y+3, #high(CLK / 0x10000) 
+0BB0 12028B     270            lcall xchg_xy
+0BB3            270            
+0BB3 120215     270            lcall div32
+0BB6            270            
+0BB6            270   ; reload value = 65536-x
+0BB6 753400     270            mov y+0, #low (65536 % 0x10000) 
+0BB9 753500     270            mov y+1, #high(65536 % 0x10000) 
+0BBC 753601     270            mov y+2, #low (65536 / 0x10000) 
+0BBF 753700     270            mov y+3, #high(65536 / 0x10000) 
+0BC2 12028B     270            lcall xchg_xy
+0BC5 1200F4     270            lcall sub32
+0BC8            270   ; x now contains the reload value
+0BC8            270   ;debug_BCD
+0BC8 8530F2     270            mov RL0, x+0
+0BCB 8531F4     270            mov RH0, x+1
+0BCE            270            
+0BCE D28C       270            setb TR0
+0BD0            270            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0BD0 7A04       270            mov R2, #4
+0BD2 12038E     270            lcall Play_Note_Delay
+0BD5 C28C       270            clr TR0
+0BD7 C002       270            push AR2
+0BD9 7A14       270            mov R2, #20
+0BDB 1202AF     270            lcall ?Wait_Milli_Seconds
+0BDE D002       270            pop AR2         ;C5#
+0BE0            271            ; Compute the reload value given the base frequency and interval ratio codes
+0BE0            271   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0BE0            271   ;Calc_Interval:
+0BE0            271   ; Freq0 loaded (fundamental frequency)
+0BE0 753070     271            mov x+0, #low (key_A5 % 0x10000) 
+0BE3 753103     271            mov x+1, #high(key_A5 % 0x10000) 
+0BE6 753200     271            mov x+2, #low (key_A5 / 0x10000) 
+0BE9 753300     271            mov x+3, #high(key_A5 / 0x10000)  
+0BEC            271   ; Load upper ratio
+0BEC 753409     271            mov y+0, #low (tone_ma2a % 0x10000) 
+0BEF 753500     271            mov y+1, #high(tone_ma2a % 0x10000) 
+0BF2 753600     271            mov y+2, #low (tone_ma2a / 0x10000) 
+0BF5 753700     271            mov y+3, #high(tone_ma2a / 0x10000) 
+0BF8 120188     271            lcall mul32
+0BFB            271            
+0BFB            271   ; Load lower ratio
+0BFB 753408     271            mov y+0, #low (tone_ma2b % 0x10000) 
+0BFE 753500     271            mov y+1, #high(tone_ma2b % 0x10000) 
+0C01 753600     271            mov y+2, #low (tone_ma2b / 0x10000) 
+0C04 753700     271            mov y+3, #high(tone_ma2b / 0x10000) 
+0C07 120215     271            lcall div32
+0C0A            271   ; compute value for reload
+0C0A            271   ; reload rate = CLK/freq
+0C0A 753400     271            mov y+0, #low (CLK % 0x10000) 
+0C0D 753580     271            mov y+1, #high(CLK % 0x10000) 
+0C10 753651     271            mov y+2, #low (CLK / 0x10000) 
+0C13 753701     271            mov y+3, #high(CLK / 0x10000) 
+0C16 12028B     271            lcall xchg_xy
+0C19            271            
+0C19 120215     271            lcall div32
+0C1C            271            
+0C1C            271   ; reload value = 65536-x
+0C1C 753400     271            mov y+0, #low (65536 % 0x10000) 
+0C1F 753500     271            mov y+1, #high(65536 % 0x10000) 
+0C22 753601     271            mov y+2, #low (65536 / 0x10000) 
+0C25 753700     271            mov y+3, #high(65536 / 0x10000) 
+0C28 12028B     271            lcall xchg_xy
+0C2B 1200F4     271            lcall sub32
+0C2E            271   ; x now contains the reload value
+0C2E            271   ;debug_BCD
+0C2E 8530F2     271            mov RL0, x+0
+0C31 8531F4     271            mov RH0, x+1
+0C34            271            
+0C34 D28C       271            setb TR0
+0C36            271            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0C36 7A08       271            mov R2, #8
+0C38 12038E     271            lcall Play_Note_Delay
+0C3B C28C       271            clr TR0
+0C3D C002       271            push AR2
+0C3F 7A14       271            mov R2, #20
+0C41 1202AF     271            lcall ?Wait_Milli_Seconds
+0C44 D002       271            pop AR2         ;B5
+0C46            272            
+0C46            273            ; Compute the reload value given the base frequency and interval ratio codes
+0C46            273   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0C46            273   ;Calc_Interval:
+0C46            273   ; Freq0 loaded (fundamental frequency)
+0C46 753070     273            mov x+0, #low (key_A5 % 0x10000) 
+0C49 753103     273            mov x+1, #high(key_A5 % 0x10000) 
+0C4C 753200     273            mov x+2, #low (key_A5 / 0x10000) 
+0C4F 753300     273            mov x+3, #high(key_A5 / 0x10000)  
+0C52            273   ; Load upper ratio
+0C52 753403     273            mov y+0, #low (tone_p5a % 0x10000) 
+0C55 753500     273            mov y+1, #high(tone_p5a % 0x10000) 
+0C58 753600     273            mov y+2, #low (tone_p5a / 0x10000) 
+0C5B 753700     273            mov y+3, #high(tone_p5a / 0x10000) 
+0C5E 120188     273            lcall mul32
+0C61            273            
+0C61            273   ; Load lower ratio
+0C61 753402     273            mov y+0, #low (tone_p5b % 0x10000) 
+0C64 753500     273            mov y+1, #high(tone_p5b % 0x10000) 
+0C67 753600     273            mov y+2, #low (tone_p5b / 0x10000) 
+0C6A 753700     273            mov y+3, #high(tone_p5b / 0x10000) 
+0C6D 120215     273            lcall div32
+0C70            273   ; compute value for reload
+0C70            273   ; reload rate = CLK/freq
+0C70 753400     273            mov y+0, #low (CLK % 0x10000) 
+0C73 753580     273            mov y+1, #high(CLK % 0x10000) 
+0C76 753651     273            mov y+2, #low (CLK / 0x10000) 
+0C79 753701     273            mov y+3, #high(CLK / 0x10000) 
+0C7C 12028B     273            lcall xchg_xy
+0C7F            273            
+0C7F 120215     273            lcall div32
+0C82            273            
+0C82            273   ; reload value = 65536-x
+0C82 753400     273            mov y+0, #low (65536 % 0x10000) 
+0C85 753500     273            mov y+1, #high(65536 % 0x10000) 
+0C88 753601     273            mov y+2, #low (65536 / 0x10000) 
+0C8B 753700     273            mov y+3, #high(65536 / 0x10000) 
+0C8E 12028B     273            lcall xchg_xy
+0C91 1200F4     273            lcall sub32
+0C94            273   ; x now contains the reload value
+0C94            273   ;debug_BCD
+0C94 8530F2     273            mov RL0, x+0
+0C97 8531F4     273            mov RH0, x+1
+0C9A            273            
+0C9A D28C       273            setb TR0
+0C9C            273            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0C9C 7A04       273            mov R2, #4
+0C9E 12038E     273            lcall Play_Note_Delay
+0CA1 C28C       273            clr TR0
+0CA3 C002       273            push AR2
+0CA5 7A14       273            mov R2, #20
+0CA7 1202AF     273            lcall ?Wait_Milli_Seconds
+0CAA D002       273            pop AR2         ;E5
+0CAC            274            ; Compute the reload value given the base frequency and interval ratio codes
+0CAC            274   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0CAC            274   ;Calc_Interval:
+0CAC            274   ; Freq0 loaded (fundamental frequency)
+0CAC 753070     274            mov x+0, #low (key_A5 % 0x10000) 
+0CAF 753103     274            mov x+1, #high(key_A5 % 0x10000) 
+0CB2 753200     274            mov x+2, #low (key_A5 / 0x10000) 
+0CB5 753300     274            mov x+3, #high(key_A5 / 0x10000)  
+0CB8            274   ; Load upper ratio
+0CB8 753403     274            mov y+0, #low (tone_p5a % 0x10000) 
+0CBB 753500     274            mov y+1, #high(tone_p5a % 0x10000) 
+0CBE 753600     274            mov y+2, #low (tone_p5a / 0x10000) 
+0CC1 753700     274            mov y+3, #high(tone_p5a / 0x10000) 
+0CC4 120188     274            lcall mul32
+0CC7            274            
+0CC7            274   ; Load lower ratio
+0CC7 753402     274            mov y+0, #low (tone_p5b % 0x10000) 
+0CCA 753500     274            mov y+1, #high(tone_p5b % 0x10000) 
+0CCD 753600     274            mov y+2, #low (tone_p5b / 0x10000) 
+0CD0 753700     274            mov y+3, #high(tone_p5b / 0x10000) 
+0CD3 120215     274            lcall div32
+0CD6            274   ; compute value for reload
+0CD6            274   ; reload rate = CLK/freq
+0CD6 753400     274            mov y+0, #low (CLK % 0x10000) 
+0CD9 753580     274            mov y+1, #high(CLK % 0x10000) 
+0CDC 753651     274            mov y+2, #low (CLK / 0x10000) 
+0CDF 753701     274            mov y+3, #high(CLK / 0x10000) 
+0CE2 12028B     274            lcall xchg_xy
+0CE5            274            
+0CE5 120215     274            lcall div32
+0CE8            274            
+0CE8            274   ; reload value = 65536-x
+0CE8 753400     274            mov y+0, #low (65536 % 0x10000) 
+0CEB 753500     274            mov y+1, #high(65536 % 0x10000) 
+0CEE 753601     274            mov y+2, #low (65536 / 0x10000) 
+0CF1 753700     274            mov y+3, #high(65536 / 0x10000) 
+0CF4 12028B     274            lcall xchg_xy
+0CF7 1200F4     274            lcall sub32
+0CFA            274   ; x now contains the reload value
+0CFA            274   ;debug_BCD
+0CFA 8530F2     274            mov RL0, x+0
+0CFD 8531F4     274            mov RH0, x+1
+0D00            274            
+0D00 D28C       274            setb TR0
+0D02            274            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0D02 7A04       274            mov R2, #4
+0D04 12038E     274            lcall Play_Note_Delay
+0D07 C28C       274            clr TR0
+0D09 C002       274            push AR2
+0D0B 7A14       274            mov R2, #20
+0D0D 1202AF     274            lcall ?Wait_Milli_Seconds
+0D10 D002       274            pop AR2         ;E5
+0D12            275            ; Compute the reload value given the base frequency and interval ratio codes
+0D12            275   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0D12            275   ;Calc_Interval:
+0D12            275   ; Freq0 loaded (fundamental frequency)
+0D12 753070     275            mov x+0, #low (key_A5 % 0x10000) 
+0D15 753103     275            mov x+1, #high(key_A5 % 0x10000) 
+0D18 753200     275            mov x+2, #low (key_A5 / 0x10000) 
+0D1B 753300     275            mov x+3, #high(key_A5 / 0x10000)  
+0D1E            275   ; Load upper ratio
+0D1E 753404     275            mov y+0, #low (tone_p4a % 0x10000) 
+0D21 753500     275            mov y+1, #high(tone_p4a % 0x10000) 
+0D24 753600     275            mov y+2, #low (tone_p4a / 0x10000) 
+0D27 753700     275            mov y+3, #high(tone_p4a / 0x10000) 
+0D2A 120188     275            lcall mul32
+0D2D            275            
+0D2D            275   ; Load lower ratio
+0D2D 753403     275            mov y+0, #low (tone_p4b % 0x10000) 
+0D30 753500     275            mov y+1, #high(tone_p4b % 0x10000) 
+0D33 753600     275            mov y+2, #low (tone_p4b / 0x10000) 
+0D36 753700     275            mov y+3, #high(tone_p4b / 0x10000) 
+0D39 120215     275            lcall div32
+0D3C            275   ; compute value for reload
+0D3C            275   ; reload rate = CLK/freq
+0D3C 753400     275            mov y+0, #low (CLK % 0x10000) 
+0D3F 753580     275            mov y+1, #high(CLK % 0x10000) 
+0D42 753651     275            mov y+2, #low (CLK / 0x10000) 
+0D45 753701     275            mov y+3, #high(CLK / 0x10000) 
+0D48 12028B     275            lcall xchg_xy
+0D4B            275            
+0D4B 120215     275            lcall div32
+0D4E            275            
+0D4E            275   ; reload value = 65536-x
+0D4E 753400     275            mov y+0, #low (65536 % 0x10000) 
+0D51 753500     275            mov y+1, #high(65536 % 0x10000) 
+0D54 753601     275            mov y+2, #low (65536 / 0x10000) 
+0D57 753700     275            mov y+3, #high(65536 / 0x10000) 
+0D5A 12028B     275            lcall xchg_xy
+0D5D 1200F4     275            lcall sub32
+0D60            275   ; x now contains the reload value
+0D60            275   ;debug_BCD
+0D60 8530F2     275            mov RL0, x+0
+0D63 8531F4     275            mov RH0, x+1
+0D66            275            
+0D66 D28C       275            setb TR0
+0D68            275            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0D68 7A04       275            mov R2, #4
+0D6A 12038E     275            lcall Play_Note_Delay
+0D6D C28C       275            clr TR0
+0D6F C002       275            push AR2
+0D71 7A14       275            mov R2, #20
+0D73 1202AF     275            lcall ?Wait_Milli_Seconds
+0D76 D002       275            pop AR2         ;D5
+0D78            276            ; Compute the reload value given the base frequency and interval ratio codes
+0D78            276   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0D78            276   ;Calc_Interval:
+0D78            276   ; Freq0 loaded (fundamental frequency)
+0D78 753070     276            mov x+0, #low (key_A5 % 0x10000) 
+0D7B 753103     276            mov x+1, #high(key_A5 % 0x10000) 
+0D7E 753200     276            mov x+2, #low (key_A5 / 0x10000) 
+0D81 753300     276            mov x+3, #high(key_A5 / 0x10000)  
+0D84            276   ; Load upper ratio
+0D84 753404     276            mov y+0, #low (tone_p4a % 0x10000) 
+0D87 753500     276            mov y+1, #high(tone_p4a % 0x10000) 
+0D8A 753600     276            mov y+2, #low (tone_p4a / 0x10000) 
+0D8D 753700     276            mov y+3, #high(tone_p4a / 0x10000) 
+0D90 120188     276            lcall mul32
+0D93            276            
+0D93            276   ; Load lower ratio
+0D93 753403     276            mov y+0, #low (tone_p4b % 0x10000) 
+0D96 753500     276            mov y+1, #high(tone_p4b % 0x10000) 
+0D99 753600     276            mov y+2, #low (tone_p4b / 0x10000) 
+0D9C 753700     276            mov y+3, #high(tone_p4b / 0x10000) 
+0D9F 120215     276            lcall div32
+0DA2            276   ; compute value for reload
+0DA2            276   ; reload rate = CLK/freq
+0DA2 753400     276            mov y+0, #low (CLK % 0x10000) 
+0DA5 753580     276            mov y+1, #high(CLK % 0x10000) 
+0DA8 753651     276            mov y+2, #low (CLK / 0x10000) 
+0DAB 753701     276            mov y+3, #high(CLK / 0x10000) 
+0DAE 12028B     276            lcall xchg_xy
+0DB1            276            
+0DB1 120215     276            lcall div32
+0DB4            276            
+0DB4            276   ; reload value = 65536-x
+0DB4 753400     276            mov y+0, #low (65536 % 0x10000) 
+0DB7 753500     276            mov y+1, #high(65536 % 0x10000) 
+0DBA 753601     276            mov y+2, #low (65536 / 0x10000) 
+0DBD 753700     276            mov y+3, #high(65536 / 0x10000) 
+0DC0 12028B     276            lcall xchg_xy
+0DC3 1200F4     276            lcall sub32
+0DC6            276   ; x now contains the reload value
+0DC6            276   ;debug_BCD
+0DC6 8530F2     276            mov RL0, x+0
+0DC9 8531F4     276            mov RH0, x+1
+0DCC            276            
+0DCC D28C       276            setb TR0
+0DCE            276            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0DCE 7A04       276            mov R2, #4
+0DD0 12038E     276            lcall Play_Note_Delay
+0DD3 C28C       276            clr TR0
+0DD5 C002       276            push AR2
+0DD7 7A14       276            mov R2, #20
+0DD9 1202AF     276            lcall ?Wait_Milli_Seconds
+0DDC D002       276            pop AR2         ;D5
+0DDE            277            
+0DDE            278            ; Compute the reload value given the base frequency and interval ratio codes
+0DDE            278   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0DDE            278   ;Calc_Interval:
+0DDE            278   ; Freq0 loaded (fundamental frequency)
+0DDE 753070     278            mov x+0, #low (key_A5 % 0x10000) 
+0DE1 753103     278            mov x+1, #high(key_A5 % 0x10000) 
+0DE4 753200     278            mov x+2, #low (key_A5 / 0x10000) 
+0DE7 753300     278            mov x+3, #high(key_A5 / 0x10000)  
+0DEA            278   ; Load upper ratio
+0DEA 753405     278            mov y+0, #low (tone_ma3a % 0x10000) 
+0DED 753500     278            mov y+1, #high(tone_ma3a % 0x10000) 
+0DF0 753600     278            mov y+2, #low (tone_ma3a / 0x10000) 
+0DF3 753700     278            mov y+3, #high(tone_ma3a / 0x10000) 
+0DF6 120188     278            lcall mul32
+0DF9            278            
+0DF9            278   ; Load lower ratio
+0DF9 753404     278            mov y+0, #low (tone_ma3b % 0x10000) 
+0DFC 753500     278            mov y+1, #high(tone_ma3b % 0x10000) 
+0DFF 753600     278            mov y+2, #low (tone_ma3b / 0x10000) 
+0E02 753700     278            mov y+3, #high(tone_ma3b / 0x10000) 
+0E05 120215     278            lcall div32
+0E08            278   ; compute value for reload
+0E08            278   ; reload rate = CLK/freq
+0E08 753400     278            mov y+0, #low (CLK % 0x10000) 
+0E0B 753580     278            mov y+1, #high(CLK % 0x10000) 
+0E0E 753651     278            mov y+2, #low (CLK / 0x10000) 
+0E11 753701     278            mov y+3, #high(CLK / 0x10000) 
+0E14 12028B     278            lcall xchg_xy
+0E17            278            
+0E17 120215     278            lcall div32
+0E1A            278            
+0E1A            278   ; reload value = 65536-x
+0E1A 753400     278            mov y+0, #low (65536 % 0x10000) 
+0E1D 753500     278            mov y+1, #high(65536 % 0x10000) 
+0E20 753601     278            mov y+2, #low (65536 / 0x10000) 
+0E23 753700     278            mov y+3, #high(65536 / 0x10000) 
+0E26 12028B     278            lcall xchg_xy
+0E29 1200F4     278            lcall sub32
+0E2C            278   ; x now contains the reload value
+0E2C            278   ;debug_BCD
+0E2C 8530F2     278            mov RL0, x+0
+0E2F 8531F4     278            mov RH0, x+1
+0E32            278            
+0E32 D28C       278            setb TR0
+0E34            278            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0E34 7A04       278            mov R2, #4
+0E36 12038E     278            lcall Play_Note_Delay
+0E39 C28C       278            clr TR0
+0E3B C002       278            push AR2
+0E3D 7A14       278            mov R2, #20
+0E3F 1202AF     278            lcall ?Wait_Milli_Seconds
+0E42 D002       278            pop AR2         ;C5#
+0E44            279            ; Compute the reload value given the base frequency and interval ratio codes
+0E44            279   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0E44            279   ;Calc_Interval:
+0E44            279   ; Freq0 loaded (fundamental frequency)
+0E44 753070     279            mov x+0, #low (key_A5 % 0x10000) 
+0E47 753103     279            mov x+1, #high(key_A5 % 0x10000) 
+0E4A 753200     279            mov x+2, #low (key_A5 / 0x10000) 
+0E4D 753300     279            mov x+3, #high(key_A5 / 0x10000)  
+0E50            279   ; Load upper ratio
+0E50 753405     279            mov y+0, #low (tone_ma3a % 0x10000) 
+0E53 753500     279            mov y+1, #high(tone_ma3a % 0x10000) 
+0E56 753600     279            mov y+2, #low (tone_ma3a / 0x10000) 
+0E59 753700     279            mov y+3, #high(tone_ma3a / 0x10000) 
+0E5C 120188     279            lcall mul32
+0E5F            279            
+0E5F            279   ; Load lower ratio
+0E5F 753404     279            mov y+0, #low (tone_ma3b % 0x10000) 
+0E62 753500     279            mov y+1, #high(tone_ma3b % 0x10000) 
+0E65 753600     279            mov y+2, #low (tone_ma3b / 0x10000) 
+0E68 753700     279            mov y+3, #high(tone_ma3b / 0x10000) 
+0E6B 120215     279            lcall div32
+0E6E            279   ; compute value for reload
+0E6E            279   ; reload rate = CLK/freq
+0E6E 753400     279            mov y+0, #low (CLK % 0x10000) 
+0E71 753580     279            mov y+1, #high(CLK % 0x10000) 
+0E74 753651     279            mov y+2, #low (CLK / 0x10000) 
+0E77 753701     279            mov y+3, #high(CLK / 0x10000) 
+0E7A 12028B     279            lcall xchg_xy
+0E7D            279            
+0E7D 120215     279            lcall div32
+0E80            279            
+0E80            279   ; reload value = 65536-x
+0E80 753400     279            mov y+0, #low (65536 % 0x10000) 
+0E83 753500     279            mov y+1, #high(65536 % 0x10000) 
+0E86 753601     279            mov y+2, #low (65536 / 0x10000) 
+0E89 753700     279            mov y+3, #high(65536 / 0x10000) 
+0E8C 12028B     279            lcall xchg_xy
+0E8F 1200F4     279            lcall sub32
+0E92            279   ; x now contains the reload value
+0E92            279   ;debug_BCD
+0E92 8530F2     279            mov RL0, x+0
+0E95 8531F4     279            mov RH0, x+1
+0E98            279            
+0E98 D28C       279            setb TR0
+0E9A            279            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0E9A 7A04       279            mov R2, #4
+0E9C 12038E     279            lcall Play_Note_Delay
+0E9F C28C       279            clr TR0
+0EA1 C002       279            push AR2
+0EA3 7A14       279            mov R2, #20
+0EA5 1202AF     279            lcall ?Wait_Milli_Seconds
+0EA8 D002       279            pop AR2         ;C5#
+0EAA            280            ; Compute the reload value given the base frequency and interval ratio codes
+0EAA            280   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0EAA            280   ;Calc_Interval:
+0EAA            280   ; Freq0 loaded (fundamental frequency)
+0EAA 753070     280            mov x+0, #low (key_A5 % 0x10000) 
+0EAD 753103     280            mov x+1, #high(key_A5 % 0x10000) 
+0EB0 753200     280            mov x+2, #low (key_A5 / 0x10000) 
+0EB3 753300     280            mov x+3, #high(key_A5 / 0x10000)  
+0EB6            280   ; Load upper ratio
+0EB6 753409     280            mov y+0, #low (tone_ma2a % 0x10000) 
+0EB9 753500     280            mov y+1, #high(tone_ma2a % 0x10000) 
+0EBC 753600     280            mov y+2, #low (tone_ma2a / 0x10000) 
+0EBF 753700     280            mov y+3, #high(tone_ma2a / 0x10000) 
+0EC2 120188     280            lcall mul32
+0EC5            280            
+0EC5            280   ; Load lower ratio
+0EC5 753408     280            mov y+0, #low (tone_ma2b % 0x10000) 
+0EC8 753500     280            mov y+1, #high(tone_ma2b % 0x10000) 
+0ECB 753600     280            mov y+2, #low (tone_ma2b / 0x10000) 
+0ECE 753700     280            mov y+3, #high(tone_ma2b / 0x10000) 
+0ED1 120215     280            lcall div32
+0ED4            280   ; compute value for reload
+0ED4            280   ; reload rate = CLK/freq
+0ED4 753400     280            mov y+0, #low (CLK % 0x10000) 
+0ED7 753580     280            mov y+1, #high(CLK % 0x10000) 
+0EDA 753651     280            mov y+2, #low (CLK / 0x10000) 
+0EDD 753701     280            mov y+3, #high(CLK / 0x10000) 
+0EE0 12028B     280            lcall xchg_xy
+0EE3            280            
+0EE3 120215     280            lcall div32
+0EE6            280            
+0EE6            280   ; reload value = 65536-x
+0EE6 753400     280            mov y+0, #low (65536 % 0x10000) 
+0EE9 753500     280            mov y+1, #high(65536 % 0x10000) 
+0EEC 753601     280            mov y+2, #low (65536 / 0x10000) 
+0EEF 753700     280            mov y+3, #high(65536 / 0x10000) 
+0EF2 12028B     280            lcall xchg_xy
+0EF5 1200F4     280            lcall sub32
+0EF8            280   ; x now contains the reload value
+0EF8            280   ;debug_BCD
+0EF8 8530F2     280            mov RL0, x+0
+0EFB 8531F4     280            mov RH0, x+1
+0EFE            280            
+0EFE D28C       280            setb TR0
+0F00            280            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0F00 7A08       280            mov R2, #8
+0F02 12038E     280            lcall Play_Note_Delay
+0F05 C28C       280            clr TR0
+0F07 C002       280            push AR2
+0F09 7A14       280            mov R2, #20
+0F0B 1202AF     280            lcall ?Wait_Milli_Seconds
+0F0E D002       280            pop AR2         ;B5
+0F10            281            
+0F10            282            ; Compute the reload value given the base frequency and interval ratio codes
+0F10            282   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0F10            282   ;Calc_Interval:
+0F10            282   ; Freq0 loaded (fundamental frequency)
+0F10 753070     282            mov x+0, #low (key_A5 % 0x10000) 
+0F13 753103     282            mov x+1, #high(key_A5 % 0x10000) 
+0F16 753200     282            mov x+2, #low (key_A5 / 0x10000) 
+0F19 753300     282            mov x+3, #high(key_A5 / 0x10000)  
+0F1C            282   ; Load upper ratio
+0F1C 753401     282            mov y+0, #low (tone_p1a % 0x10000) 
+0F1F 753500     282            mov y+1, #high(tone_p1a % 0x10000) 
+0F22 753600     282            mov y+2, #low (tone_p1a / 0x10000) 
+0F25 753700     282            mov y+3, #high(tone_p1a / 0x10000) 
+0F28 120188     282            lcall mul32
+0F2B            282            
+0F2B            282   ; Load lower ratio
+0F2B 753401     282            mov y+0, #low (tone_p1b % 0x10000) 
+0F2E 753500     282            mov y+1, #high(tone_p1b % 0x10000) 
+0F31 753600     282            mov y+2, #low (tone_p1b / 0x10000) 
+0F34 753700     282            mov y+3, #high(tone_p1b / 0x10000) 
+0F37 120215     282            lcall div32
+0F3A            282   ; compute value for reload
+0F3A            282   ; reload rate = CLK/freq
+0F3A 753400     282            mov y+0, #low (CLK % 0x10000) 
+0F3D 753580     282            mov y+1, #high(CLK % 0x10000) 
+0F40 753651     282            mov y+2, #low (CLK / 0x10000) 
+0F43 753701     282            mov y+3, #high(CLK / 0x10000) 
+0F46 12028B     282            lcall xchg_xy
+0F49            282            
+0F49 120215     282            lcall div32
+0F4C            282            
+0F4C            282   ; reload value = 65536-x
+0F4C 753400     282            mov y+0, #low (65536 % 0x10000) 
+0F4F 753500     282            mov y+1, #high(65536 % 0x10000) 
+0F52 753601     282            mov y+2, #low (65536 / 0x10000) 
+0F55 753700     282            mov y+3, #high(65536 / 0x10000) 
+0F58 12028B     282            lcall xchg_xy
+0F5B 1200F4     282            lcall sub32
+0F5E            282   ; x now contains the reload value
+0F5E            282   ;debug_BCD
+0F5E 8530F2     282            mov RL0, x+0
+0F61 8531F4     282            mov RH0, x+1
+0F64            282            
+0F64 D28C       282            setb TR0
+0F66            282            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0F66 7A04       282            mov R2, #4
+0F68 12038E     282            lcall Play_Note_Delay
+0F6B C28C       282            clr TR0
+0F6D C002       282            push AR2
+0F6F 7A14       282            mov R2, #20
+0F71 1202AF     282            lcall ?Wait_Milli_Seconds
+0F74 D002       282            pop AR2         ;A5
+0F76            283            ; Compute the reload value given the base frequency and interval ratio codes
+0F76            283   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0F76            283   ;Calc_Interval:
+0F76            283   ; Freq0 loaded (fundamental frequency)
+0F76 753070     283            mov x+0, #low (key_A5 % 0x10000) 
+0F79 753103     283            mov x+1, #high(key_A5 % 0x10000) 
+0F7C 753200     283            mov x+2, #low (key_A5 / 0x10000) 
+0F7F 753300     283            mov x+3, #high(key_A5 / 0x10000)  
+0F82            283   ; Load upper ratio
+0F82 753401     283            mov y+0, #low (tone_p1a % 0x10000) 
+0F85 753500     283            mov y+1, #high(tone_p1a % 0x10000) 
+0F88 753600     283            mov y+2, #low (tone_p1a / 0x10000) 
+0F8B 753700     283            mov y+3, #high(tone_p1a / 0x10000) 
+0F8E 120188     283            lcall mul32
+0F91            283            
+0F91            283   ; Load lower ratio
+0F91 753401     283            mov y+0, #low (tone_p1b % 0x10000) 
+0F94 753500     283            mov y+1, #high(tone_p1b % 0x10000) 
+0F97 753600     283            mov y+2, #low (tone_p1b / 0x10000) 
+0F9A 753700     283            mov y+3, #high(tone_p1b / 0x10000) 
+0F9D 120215     283            lcall div32
+0FA0            283   ; compute value for reload
+0FA0            283   ; reload rate = CLK/freq
+0FA0 753400     283            mov y+0, #low (CLK % 0x10000) 
+0FA3 753580     283            mov y+1, #high(CLK % 0x10000) 
+0FA6 753651     283            mov y+2, #low (CLK / 0x10000) 
+0FA9 753701     283            mov y+3, #high(CLK / 0x10000) 
+0FAC 12028B     283            lcall xchg_xy
+0FAF            283            
+0FAF 120215     283            lcall div32
+0FB2            283            
+0FB2            283   ; reload value = 65536-x
+0FB2 753400     283            mov y+0, #low (65536 % 0x10000) 
+0FB5 753500     283            mov y+1, #high(65536 % 0x10000) 
+0FB8 753601     283            mov y+2, #low (65536 / 0x10000) 
+0FBB 753700     283            mov y+3, #high(65536 / 0x10000) 
+0FBE 12028B     283            lcall xchg_xy
+0FC1 1200F4     283            lcall sub32
+0FC4            283   ; x now contains the reload value
+0FC4            283   ;debug_BCD
+0FC4 8530F2     283            mov RL0, x+0
+0FC7 8531F4     283            mov RH0, x+1
+0FCA            283            
+0FCA D28C       283            setb TR0
+0FCC            283            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+0FCC 7A04       283            mov R2, #4
+0FCE 12038E     283            lcall Play_Note_Delay
+0FD1 C28C       283            clr TR0
+0FD3 C002       283            push AR2
+0FD5 7A14       283            mov R2, #20
+0FD7 1202AF     283            lcall ?Wait_Milli_Seconds
+0FDA D002       283            pop AR2         ;A5
+0FDC            284            ; Compute the reload value given the base frequency and interval ratio codes
+0FDC            284   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+0FDC            284   ;Calc_Interval:
+0FDC            284   ; Freq0 loaded (fundamental frequency)
+0FDC 753070     284            mov x+0, #low (key_A5 % 0x10000) 
+0FDF 753103     284            mov x+1, #high(key_A5 % 0x10000) 
+0FE2 753200     284            mov x+2, #low (key_A5 / 0x10000) 
+0FE5 753300     284            mov x+3, #high(key_A5 / 0x10000)  
+0FE8            284   ; Load upper ratio
+0FE8 753403     284            mov y+0, #low (tone_p5a % 0x10000) 
+0FEB 753500     284            mov y+1, #high(tone_p5a % 0x10000) 
+0FEE 753600     284            mov y+2, #low (tone_p5a / 0x10000) 
+0FF1 753700     284            mov y+3, #high(tone_p5a / 0x10000) 
+0FF4 120188     284            lcall mul32
+0FF7            284            
+0FF7            284   ; Load lower ratio
+0FF7 753402     284            mov y+0, #low (tone_p5b % 0x10000) 
+0FFA 753500     284            mov y+1, #high(tone_p5b % 0x10000) 
+0FFD 753600     284            mov y+2, #low (tone_p5b / 0x10000) 
+1000 753700     284            mov y+3, #high(tone_p5b / 0x10000) 
+1003 120215     284            lcall div32
+1006            284   ; compute value for reload
+1006            284   ; reload rate = CLK/freq
+1006 753400     284            mov y+0, #low (CLK % 0x10000) 
+1009 753580     284            mov y+1, #high(CLK % 0x10000) 
+100C 753651     284            mov y+2, #low (CLK / 0x10000) 
+100F 753701     284            mov y+3, #high(CLK / 0x10000) 
+1012 12028B     284            lcall xchg_xy
+1015            284            
+1015 120215     284            lcall div32
+1018            284            
+1018            284   ; reload value = 65536-x
+1018 753400     284            mov y+0, #low (65536 % 0x10000) 
+101B 753500     284            mov y+1, #high(65536 % 0x10000) 
+101E 753601     284            mov y+2, #low (65536 / 0x10000) 
+1021 753700     284            mov y+3, #high(65536 / 0x10000) 
+1024 12028B     284            lcall xchg_xy
+1027 1200F4     284            lcall sub32
+102A            284   ; x now contains the reload value
+102A            284   ;debug_BCD
+102A 8530F2     284            mov RL0, x+0
+102D 8531F4     284            mov RH0, x+1
+1030            284            
+1030 D28C       284            setb TR0
+1032            284            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+1032 7A04       284            mov R2, #4
+1034 12038E     284            lcall Play_Note_Delay
+1037 C28C       284            clr TR0
+1039 C002       284            push AR2
+103B 7A14       284            mov R2, #20
+103D 1202AF     284            lcall ?Wait_Milli_Seconds
+1040 D002       284            pop AR2         ;E5
+1042            285            ; Compute the reload value given the base frequency and interval ratio codes
+1042            285   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+1042            285   ;Calc_Interval:
+1042            285   ; Freq0 loaded (fundamental frequency)
+1042 753070     285            mov x+0, #low (key_A5 % 0x10000) 
+1045 753103     285            mov x+1, #high(key_A5 % 0x10000) 
+1048 753200     285            mov x+2, #low (key_A5 / 0x10000) 
+104B 753300     285            mov x+3, #high(key_A5 / 0x10000)  
+104E            285   ; Load upper ratio
+104E 753403     285            mov y+0, #low (tone_p5a % 0x10000) 
+1051 753500     285            mov y+1, #high(tone_p5a % 0x10000) 
+1054 753600     285            mov y+2, #low (tone_p5a / 0x10000) 
+1057 753700     285            mov y+3, #high(tone_p5a / 0x10000) 
+105A 120188     285            lcall mul32
+105D            285            
+105D            285   ; Load lower ratio
+105D 753402     285            mov y+0, #low (tone_p5b % 0x10000) 
+1060 753500     285            mov y+1, #high(tone_p5b % 0x10000) 
+1063 753600     285            mov y+2, #low (tone_p5b / 0x10000) 
+1066 753700     285            mov y+3, #high(tone_p5b / 0x10000) 
+1069 120215     285            lcall div32
+106C            285   ; compute value for reload
+106C            285   ; reload rate = CLK/freq
+106C 753400     285            mov y+0, #low (CLK % 0x10000) 
+106F 753580     285            mov y+1, #high(CLK % 0x10000) 
+1072 753651     285            mov y+2, #low (CLK / 0x10000) 
+1075 753701     285            mov y+3, #high(CLK / 0x10000) 
+1078 12028B     285            lcall xchg_xy
+107B            285            
+107B 120215     285            lcall div32
+107E            285            
+107E            285   ; reload value = 65536-x
+107E 753400     285            mov y+0, #low (65536 % 0x10000) 
+1081 753500     285            mov y+1, #high(65536 % 0x10000) 
+1084 753601     285            mov y+2, #low (65536 / 0x10000) 
+1087 753700     285            mov y+3, #high(65536 / 0x10000) 
+108A 12028B     285            lcall xchg_xy
+108D 1200F4     285            lcall sub32
+1090            285   ; x now contains the reload value
+1090            285   ;debug_BCD
+1090 8530F2     285            mov RL0, x+0
+1093 8531F4     285            mov RH0, x+1
+1096            285            
+1096 D28C       285            setb TR0
+1098            285            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+1098 7A04       285            mov R2, #4
+109A 12038E     285            lcall Play_Note_Delay
+109D C28C       285            clr TR0
+109F C002       285            push AR2
+10A1 7A14       285            mov R2, #20
+10A3 1202AF     285            lcall ?Wait_Milli_Seconds
+10A6 D002       285            pop AR2         ;E5
+10A8            286            
+10A8            287            ; Compute the reload value given the base frequency and interval ratio codes
+10A8            287   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+10A8            287   ;Calc_Interval:
+10A8            287   ; Freq0 loaded (fundamental frequency)
+10A8 753070     287            mov x+0, #low (key_A5 % 0x10000) 
+10AB 753103     287            mov x+1, #high(key_A5 % 0x10000) 
+10AE 753200     287            mov x+2, #low (key_A5 / 0x10000) 
+10B1 753300     287            mov x+3, #high(key_A5 / 0x10000)  
+10B4            287   ; Load upper ratio
+10B4 753405     287            mov y+0, #low (tone_ma6a % 0x10000) 
+10B7 753500     287            mov y+1, #high(tone_ma6a % 0x10000) 
+10BA 753600     287            mov y+2, #low (tone_ma6a / 0x10000) 
+10BD 753700     287            mov y+3, #high(tone_ma6a / 0x10000) 
+10C0 120188     287            lcall mul32
+10C3            287            
+10C3            287   ; Load lower ratio
+10C3 753403     287            mov y+0, #low (tone_ma6b % 0x10000) 
+10C6 753500     287            mov y+1, #high(tone_ma6b % 0x10000) 
+10C9 753600     287            mov y+2, #low (tone_ma6b / 0x10000) 
+10CC 753700     287            mov y+3, #high(tone_ma6b / 0x10000) 
+10CF 120215     287            lcall div32
+10D2            287   ; compute value for reload
+10D2            287   ; reload rate = CLK/freq
+10D2 753400     287            mov y+0, #low (CLK % 0x10000) 
+10D5 753580     287            mov y+1, #high(CLK % 0x10000) 
+10D8 753651     287            mov y+2, #low (CLK / 0x10000) 
+10DB 753701     287            mov y+3, #high(CLK / 0x10000) 
+10DE 12028B     287            lcall xchg_xy
+10E1            287            
+10E1 120215     287            lcall div32
+10E4            287            
+10E4            287   ; reload value = 65536-x
+10E4 753400     287            mov y+0, #low (65536 % 0x10000) 
+10E7 753500     287            mov y+1, #high(65536 % 0x10000) 
+10EA 753601     287            mov y+2, #low (65536 / 0x10000) 
+10ED 753700     287            mov y+3, #high(65536 / 0x10000) 
+10F0 12028B     287            lcall xchg_xy
+10F3 1200F4     287            lcall sub32
+10F6            287   ; x now contains the reload value
+10F6            287   ;debug_BCD
+10F6 8530F2     287            mov RL0, x+0
+10F9 8531F4     287            mov RH0, x+1
+10FC            287            
+10FC D28C       287            setb TR0
+10FE            287            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+10FE 7A04       287            mov R2, #4
+1100 12038E     287            lcall Play_Note_Delay
+1103 C28C       287            clr TR0
+1105 C002       287            push AR2
+1107 7A14       287            mov R2, #20
+1109 1202AF     287            lcall ?Wait_Milli_Seconds
+110C D002       287            pop AR2         ;F5
+110E            288            ; Compute the reload value given the base frequency and interval ratio codes
+110E            288   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+110E            288   ;Calc_Interval:
+110E            288   ; Freq0 loaded (fundamental frequency)
+110E 753070     288            mov x+0, #low (key_A5 % 0x10000) 
+1111 753103     288            mov x+1, #high(key_A5 % 0x10000) 
+1114 753200     288            mov x+2, #low (key_A5 / 0x10000) 
+1117 753300     288            mov x+3, #high(key_A5 / 0x10000)  
+111A            288   ; Load upper ratio
+111A 753405     288            mov y+0, #low (tone_ma6a % 0x10000) 
+111D 753500     288            mov y+1, #high(tone_ma6a % 0x10000) 
+1120 753600     288            mov y+2, #low (tone_ma6a / 0x10000) 
+1123 753700     288            mov y+3, #high(tone_ma6a / 0x10000) 
+1126 120188     288            lcall mul32
+1129            288            
+1129            288   ; Load lower ratio
+1129 753403     288            mov y+0, #low (tone_ma6b % 0x10000) 
+112C 753500     288            mov y+1, #high(tone_ma6b % 0x10000) 
+112F 753600     288            mov y+2, #low (tone_ma6b / 0x10000) 
+1132 753700     288            mov y+3, #high(tone_ma6b / 0x10000) 
+1135 120215     288            lcall div32
+1138            288   ; compute value for reload
+1138            288   ; reload rate = CLK/freq
+1138 753400     288            mov y+0, #low (CLK % 0x10000) 
+113B 753580     288            mov y+1, #high(CLK % 0x10000) 
+113E 753651     288            mov y+2, #low (CLK / 0x10000) 
+1141 753701     288            mov y+3, #high(CLK / 0x10000) 
+1144 12028B     288            lcall xchg_xy
+1147            288            
+1147 120215     288            lcall div32
+114A            288            
+114A            288   ; reload value = 65536-x
+114A 753400     288            mov y+0, #low (65536 % 0x10000) 
+114D 753500     288            mov y+1, #high(65536 % 0x10000) 
+1150 753601     288            mov y+2, #low (65536 / 0x10000) 
+1153 753700     288            mov y+3, #high(65536 / 0x10000) 
+1156 12028B     288            lcall xchg_xy
+1159 1200F4     288            lcall sub32
+115C            288   ; x now contains the reload value
+115C            288   ;debug_BCD
+115C 8530F2     288            mov RL0, x+0
+115F 8531F4     288            mov RH0, x+1
+1162            288            
+1162 D28C       288            setb TR0
+1164            288            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+1164 7A04       288            mov R2, #4
+1166 12038E     288            lcall Play_Note_Delay
+1169 C28C       288            clr TR0
+116B C002       288            push AR2
+116D 7A14       288            mov R2, #20
+116F 1202AF     288            lcall ?Wait_Milli_Seconds
+1172 D002       288            pop AR2         ;F5
+1174            289            ; Compute the reload value given the base frequency and interval ratio codes
+1174            289   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+1174            289   ;Calc_Interval:
+1174            289   ; Freq0 loaded (fundamental frequency)
+1174 753070     289            mov x+0, #low (key_A5 % 0x10000) 
+1177 753103     289            mov x+1, #high(key_A5 % 0x10000) 
+117A 753200     289            mov x+2, #low (key_A5 / 0x10000) 
+117D 753300     289            mov x+3, #high(key_A5 / 0x10000)  
+1180            289   ; Load upper ratio
+1180 753403     289            mov y+0, #low (tone_p5a % 0x10000) 
+1183 753500     289            mov y+1, #high(tone_p5a % 0x10000) 
+1186 753600     289            mov y+2, #low (tone_p5a / 0x10000) 
+1189 753700     289            mov y+3, #high(tone_p5a / 0x10000) 
+118C 120188     289            lcall mul32
+118F            289            
+118F            289   ; Load lower ratio
+118F 753402     289            mov y+0, #low (tone_p5b % 0x10000) 
+1192 753500     289            mov y+1, #high(tone_p5b % 0x10000) 
+1195 753600     289            mov y+2, #low (tone_p5b / 0x10000) 
+1198 753700     289            mov y+3, #high(tone_p5b / 0x10000) 
+119B 120215     289            lcall div32
+119E            289   ; compute value for reload
+119E            289   ; reload rate = CLK/freq
+119E 753400     289            mov y+0, #low (CLK % 0x10000) 
+11A1 753580     289            mov y+1, #high(CLK % 0x10000) 
+11A4 753651     289            mov y+2, #low (CLK / 0x10000) 
+11A7 753701     289            mov y+3, #high(CLK / 0x10000) 
+11AA 12028B     289            lcall xchg_xy
+11AD            289            
+11AD 120215     289            lcall div32
+11B0            289            
+11B0            289   ; reload value = 65536-x
+11B0 753400     289            mov y+0, #low (65536 % 0x10000) 
+11B3 753500     289            mov y+1, #high(65536 % 0x10000) 
+11B6 753601     289            mov y+2, #low (65536 / 0x10000) 
+11B9 753700     289            mov y+3, #high(65536 / 0x10000) 
+11BC 12028B     289            lcall xchg_xy
+11BF 1200F4     289            lcall sub32
+11C2            289   ; x now contains the reload value
+11C2            289   ;debug_BCD
+11C2 8530F2     289            mov RL0, x+0
+11C5 8531F4     289            mov RH0, x+1
+11C8            289            
+11C8 D28C       289            setb TR0
+11CA            289            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+11CA 7A08       289            mov R2, #8
+11CC 12038E     289            lcall Play_Note_Delay
+11CF C28C       289            clr TR0
+11D1 C002       289            push AR2
+11D3 7A14       289            mov R2, #20
+11D5 1202AF     289            lcall ?Wait_Milli_Seconds
+11D8 D002       289            pop AR2         ;E5
+11DA            290            
+11DA            291            ; Compute the reload value given the base frequency and interval ratio codes
+11DA            291   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+11DA            291   ;Calc_Interval:
+11DA            291   ; Freq0 loaded (fundamental frequency)
+11DA 753070     291            mov x+0, #low (key_A5 % 0x10000) 
+11DD 753103     291            mov x+1, #high(key_A5 % 0x10000) 
+11E0 753200     291            mov x+2, #low (key_A5 / 0x10000) 
+11E3 753300     291            mov x+3, #high(key_A5 / 0x10000)  
+11E6            291   ; Load upper ratio
+11E6 753404     291            mov y+0, #low (tone_p4a % 0x10000) 
+11E9 753500     291            mov y+1, #high(tone_p4a % 0x10000) 
+11EC 753600     291            mov y+2, #low (tone_p4a / 0x10000) 
+11EF 753700     291            mov y+3, #high(tone_p4a / 0x10000) 
+11F2 120188     291            lcall mul32
+11F5            291            
+11F5            291   ; Load lower ratio
+11F5 753403     291            mov y+0, #low (tone_p4b % 0x10000) 
+11F8 753500     291            mov y+1, #high(tone_p4b % 0x10000) 
+11FB 753600     291            mov y+2, #low (tone_p4b / 0x10000) 
+11FE 753700     291            mov y+3, #high(tone_p4b / 0x10000) 
+1201 120215     291            lcall div32
+1204            291   ; compute value for reload
+1204            291   ; reload rate = CLK/freq
+1204 753400     291            mov y+0, #low (CLK % 0x10000) 
+1207 753580     291            mov y+1, #high(CLK % 0x10000) 
+120A 753651     291            mov y+2, #low (CLK / 0x10000) 
+120D 753701     291            mov y+3, #high(CLK / 0x10000) 
+1210 12028B     291            lcall xchg_xy
+1213            291            
+1213 120215     291            lcall div32
+1216            291            
+1216            291   ; reload value = 65536-x
+1216 753400     291            mov y+0, #low (65536 % 0x10000) 
+1219 753500     291            mov y+1, #high(65536 % 0x10000) 
+121C 753601     291            mov y+2, #low (65536 / 0x10000) 
+121F 753700     291            mov y+3, #high(65536 / 0x10000) 
+1222 12028B     291            lcall xchg_xy
+1225 1200F4     291            lcall sub32
+1228            291   ; x now contains the reload value
+1228            291   ;debug_BCD
+1228 8530F2     291            mov RL0, x+0
+122B 8531F4     291            mov RH0, x+1
+122E            291            
+122E D28C       291            setb TR0
+1230            291            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+1230 7A04       291            mov R2, #4
+1232 12038E     291            lcall Play_Note_Delay
+1235 C28C       291            clr TR0
+1237 C002       291            push AR2
+1239 7A14       291            mov R2, #20
+123B 1202AF     291            lcall ?Wait_Milli_Seconds
+123E D002       291            pop AR2         ;D5
+1240            292            ; Compute the reload value given the base frequency and interval ratio codes
+1240            292   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+1240            292   ;Calc_Interval:
+1240            292   ; Freq0 loaded (fundamental frequency)
+1240 753070     292            mov x+0, #low (key_A5 % 0x10000) 
+1243 753103     292            mov x+1, #high(key_A5 % 0x10000) 
+1246 753200     292            mov x+2, #low (key_A5 / 0x10000) 
+1249 753300     292            mov x+3, #high(key_A5 / 0x10000)  
+124C            292   ; Load upper ratio
+124C 753404     292            mov y+0, #low (tone_p4a % 0x10000) 
+124F 753500     292            mov y+1, #high(tone_p4a % 0x10000) 
+1252 753600     292            mov y+2, #low (tone_p4a / 0x10000) 
+1255 753700     292            mov y+3, #high(tone_p4a / 0x10000) 
+1258 120188     292            lcall mul32
+125B            292            
+125B            292   ; Load lower ratio
+125B 753403     292            mov y+0, #low (tone_p4b % 0x10000) 
+125E 753500     292            mov y+1, #high(tone_p4b % 0x10000) 
+1261 753600     292            mov y+2, #low (tone_p4b / 0x10000) 
+1264 753700     292            mov y+3, #high(tone_p4b / 0x10000) 
+1267 120215     292            lcall div32
+126A            292   ; compute value for reload
+126A            292   ; reload rate = CLK/freq
+126A 753400     292            mov y+0, #low (CLK % 0x10000) 
+126D 753580     292            mov y+1, #high(CLK % 0x10000) 
+1270 753651     292            mov y+2, #low (CLK / 0x10000) 
+1273 753701     292            mov y+3, #high(CLK / 0x10000) 
+1276 12028B     292            lcall xchg_xy
+1279            292            
+1279 120215     292            lcall div32
+127C            292            
+127C            292   ; reload value = 65536-x
+127C 753400     292            mov y+0, #low (65536 % 0x10000) 
+127F 753500     292            mov y+1, #high(65536 % 0x10000) 
+1282 753601     292            mov y+2, #low (65536 / 0x10000) 
+1285 753700     292            mov y+3, #high(65536 / 0x10000) 
+1288 12028B     292            lcall xchg_xy
+128B 1200F4     292            lcall sub32
+128E            292   ; x now contains the reload value
+128E            292   ;debug_BCD
+128E 8530F2     292            mov RL0, x+0
+1291 8531F4     292            mov RH0, x+1
+1294            292            
+1294 D28C       292            setb TR0
+1296            292            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+1296 7A04       292            mov R2, #4
+1298 12038E     292            lcall Play_Note_Delay
+129B C28C       292            clr TR0
+129D C002       292            push AR2
+129F 7A14       292            mov R2, #20
+12A1 1202AF     292            lcall ?Wait_Milli_Seconds
+12A4 D002       292            pop AR2         ;D5
+12A6            293            ; Compute the reload value given the base frequency and interval ratio codes
+12A6            293   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+12A6            293   ;Calc_Interval:
+12A6            293   ; Freq0 loaded (fundamental frequency)
+12A6 753070     293            mov x+0, #low (key_A5 % 0x10000) 
+12A9 753103     293            mov x+1, #high(key_A5 % 0x10000) 
+12AC 753200     293            mov x+2, #low (key_A5 / 0x10000) 
+12AF 753300     293            mov x+3, #high(key_A5 / 0x10000)  
+12B2            293   ; Load upper ratio
+12B2 753405     293            mov y+0, #low (tone_ma3a % 0x10000) 
+12B5 753500     293            mov y+1, #high(tone_ma3a % 0x10000) 
+12B8 753600     293            mov y+2, #low (tone_ma3a / 0x10000) 
+12BB 753700     293            mov y+3, #high(tone_ma3a / 0x10000) 
+12BE 120188     293            lcall mul32
+12C1            293            
+12C1            293   ; Load lower ratio
+12C1 753404     293            mov y+0, #low (tone_ma3b % 0x10000) 
+12C4 753500     293            mov y+1, #high(tone_ma3b % 0x10000) 
+12C7 753600     293            mov y+2, #low (tone_ma3b / 0x10000) 
+12CA 753700     293            mov y+3, #high(tone_ma3b / 0x10000) 
+12CD 120215     293            lcall div32
+12D0            293   ; compute value for reload
+12D0            293   ; reload rate = CLK/freq
+12D0 753400     293            mov y+0, #low (CLK % 0x10000) 
+12D3 753580     293            mov y+1, #high(CLK % 0x10000) 
+12D6 753651     293            mov y+2, #low (CLK / 0x10000) 
+12D9 753701     293            mov y+3, #high(CLK / 0x10000) 
+12DC 12028B     293            lcall xchg_xy
+12DF            293            
+12DF 120215     293            lcall div32
+12E2            293            
+12E2            293   ; reload value = 65536-x
+12E2 753400     293            mov y+0, #low (65536 % 0x10000) 
+12E5 753500     293            mov y+1, #high(65536 % 0x10000) 
+12E8 753601     293            mov y+2, #low (65536 / 0x10000) 
+12EB 753700     293            mov y+3, #high(65536 / 0x10000) 
+12EE 12028B     293            lcall xchg_xy
+12F1 1200F4     293            lcall sub32
+12F4            293   ; x now contains the reload value
+12F4            293   ;debug_BCD
+12F4 8530F2     293            mov RL0, x+0
+12F7 8531F4     293            mov RH0, x+1
+12FA            293            
+12FA D28C       293            setb TR0
+12FC            293            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+12FC 7A04       293            mov R2, #4
+12FE 12038E     293            lcall Play_Note_Delay
+1301 C28C       293            clr TR0
+1303 C002       293            push AR2
+1305 7A14       293            mov R2, #20
+1307 1202AF     293            lcall ?Wait_Milli_Seconds
+130A D002       293            pop AR2         ;C5#
+130C            294            ; Compute the reload value given the base frequency and interval ratio codes
+130C            294   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+130C            294   ;Calc_Interval:
+130C            294   ; Freq0 loaded (fundamental frequency)
+130C 753070     294            mov x+0, #low (key_A5 % 0x10000) 
+130F 753103     294            mov x+1, #high(key_A5 % 0x10000) 
+1312 753200     294            mov x+2, #low (key_A5 / 0x10000) 
+1315 753300     294            mov x+3, #high(key_A5 / 0x10000)  
+1318            294   ; Load upper ratio
+1318 753405     294            mov y+0, #low (tone_ma3a % 0x10000) 
+131B 753500     294            mov y+1, #high(tone_ma3a % 0x10000) 
+131E 753600     294            mov y+2, #low (tone_ma3a / 0x10000) 
+1321 753700     294            mov y+3, #high(tone_ma3a / 0x10000) 
+1324 120188     294            lcall mul32
+1327            294            
+1327            294   ; Load lower ratio
+1327 753404     294            mov y+0, #low (tone_ma3b % 0x10000) 
+132A 753500     294            mov y+1, #high(tone_ma3b % 0x10000) 
+132D 753600     294            mov y+2, #low (tone_ma3b / 0x10000) 
+1330 753700     294            mov y+3, #high(tone_ma3b / 0x10000) 
+1333 120215     294            lcall div32
+1336            294   ; compute value for reload
+1336            294   ; reload rate = CLK/freq
+1336 753400     294            mov y+0, #low (CLK % 0x10000) 
+1339 753580     294            mov y+1, #high(CLK % 0x10000) 
+133C 753651     294            mov y+2, #low (CLK / 0x10000) 
+133F 753701     294            mov y+3, #high(CLK / 0x10000) 
+1342 12028B     294            lcall xchg_xy
+1345            294            
+1345 120215     294            lcall div32
+1348            294            
+1348            294   ; reload value = 65536-x
+1348 753400     294            mov y+0, #low (65536 % 0x10000) 
+134B 753500     294            mov y+1, #high(65536 % 0x10000) 
+134E 753601     294            mov y+2, #low (65536 / 0x10000) 
+1351 753700     294            mov y+3, #high(65536 / 0x10000) 
+1354 12028B     294            lcall xchg_xy
+1357 1200F4     294            lcall sub32
+135A            294   ; x now contains the reload value
+135A            294   ;debug_BCD
+135A 8530F2     294            mov RL0, x+0
+135D 8531F4     294            mov RH0, x+1
+1360            294            
+1360 D28C       294            setb TR0
+1362            294            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+1362 7A04       294            mov R2, #4
+1364 12038E     294            lcall Play_Note_Delay
+1367 C28C       294            clr TR0
+1369 C002       294            push AR2
+136B 7A14       294            mov R2, #20
+136D 1202AF     294            lcall ?Wait_Milli_Seconds
+1370 D002       294            pop AR2         ;C5#
+1372            295            
+1372            296            ; Compute the reload value given the base frequency and interval ratio codes
+1372            296   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+1372            296   ;Calc_Interval:
+1372            296   ; Freq0 loaded (fundamental frequency)
+1372 753070     296            mov x+0, #low (key_A5 % 0x10000) 
+1375 753103     296            mov x+1, #high(key_A5 % 0x10000) 
+1378 753200     296            mov x+2, #low (key_A5 / 0x10000) 
+137B 753300     296            mov x+3, #high(key_A5 / 0x10000)  
+137E            296   ; Load upper ratio
+137E 753409     296            mov y+0, #low (tone_ma2a % 0x10000) 
+1381 753500     296            mov y+1, #high(tone_ma2a % 0x10000) 
+1384 753600     296            mov y+2, #low (tone_ma2a / 0x10000) 
+1387 753700     296            mov y+3, #high(tone_ma2a / 0x10000) 
+138A 120188     296            lcall mul32
+138D            296            
+138D            296   ; Load lower ratio
+138D 753408     296            mov y+0, #low (tone_ma2b % 0x10000) 
+1390 753500     296            mov y+1, #high(tone_ma2b % 0x10000) 
+1393 753600     296            mov y+2, #low (tone_ma2b / 0x10000) 
+1396 753700     296            mov y+3, #high(tone_ma2b / 0x10000) 
+1399 120215     296            lcall div32
+139C            296   ; compute value for reload
+139C            296   ; reload rate = CLK/freq
+139C 753400     296            mov y+0, #low (CLK % 0x10000) 
+139F 753580     296            mov y+1, #high(CLK % 0x10000) 
+13A2 753651     296            mov y+2, #low (CLK / 0x10000) 
+13A5 753701     296            mov y+3, #high(CLK / 0x10000) 
+13A8 12028B     296            lcall xchg_xy
+13AB            296            
+13AB 120215     296            lcall div32
+13AE            296            
+13AE            296   ; reload value = 65536-x
+13AE 753400     296            mov y+0, #low (65536 % 0x10000) 
+13B1 753500     296            mov y+1, #high(65536 % 0x10000) 
+13B4 753601     296            mov y+2, #low (65536 / 0x10000) 
+13B7 753700     296            mov y+3, #high(65536 / 0x10000) 
+13BA 12028B     296            lcall xchg_xy
+13BD 1200F4     296            lcall sub32
+13C0            296   ; x now contains the reload value
+13C0            296   ;debug_BCD
+13C0 8530F2     296            mov RL0, x+0
+13C3 8531F4     296            mov RH0, x+1
+13C6            296            
+13C6 D28C       296            setb TR0
+13C8            296            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+13C8 7A04       296            mov R2, #4
+13CA 12038E     296            lcall Play_Note_Delay
+13CD C28C       296            clr TR0
+13CF C002       296            push AR2
+13D1 7A14       296            mov R2, #20
+13D3 1202AF     296            lcall ?Wait_Milli_Seconds
+13D6 D002       296            pop AR2         ;B5
+13D8            297            ; Compute the reload value given the base frequency and interval ratio codes
+13D8            297   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+13D8            297   ;Calc_Interval:
+13D8            297   ; Freq0 loaded (fundamental frequency)
+13D8 753070     297            mov x+0, #low (key_A5 % 0x10000) 
+13DB 753103     297            mov x+1, #high(key_A5 % 0x10000) 
+13DE 753200     297            mov x+2, #low (key_A5 / 0x10000) 
+13E1 753300     297            mov x+3, #high(key_A5 / 0x10000)  
+13E4            297   ; Load upper ratio
+13E4 753409     297            mov y+0, #low (tone_ma2a % 0x10000) 
+13E7 753500     297            mov y+1, #high(tone_ma2a % 0x10000) 
+13EA 753600     297            mov y+2, #low (tone_ma2a / 0x10000) 
+13ED 753700     297            mov y+3, #high(tone_ma2a / 0x10000) 
+13F0 120188     297            lcall mul32
+13F3            297            
+13F3            297   ; Load lower ratio
+13F3 753408     297            mov y+0, #low (tone_ma2b % 0x10000) 
+13F6 753500     297            mov y+1, #high(tone_ma2b % 0x10000) 
+13F9 753600     297            mov y+2, #low (tone_ma2b / 0x10000) 
+13FC 753700     297            mov y+3, #high(tone_ma2b / 0x10000) 
+13FF 120215     297            lcall div32
+1402            297   ; compute value for reload
+1402            297   ; reload rate = CLK/freq
+1402 753400     297            mov y+0, #low (CLK % 0x10000) 
+1405 753580     297            mov y+1, #high(CLK % 0x10000) 
+1408 753651     297            mov y+2, #low (CLK / 0x10000) 
+140B 753701     297            mov y+3, #high(CLK / 0x10000) 
+140E 12028B     297            lcall xchg_xy
+1411            297            
+1411 120215     297            lcall div32
+1414            297            
+1414            297   ; reload value = 65536-x
+1414 753400     297            mov y+0, #low (65536 % 0x10000) 
+1417 753500     297            mov y+1, #high(65536 % 0x10000) 
+141A 753601     297            mov y+2, #low (65536 / 0x10000) 
+141D 753700     297            mov y+3, #high(65536 / 0x10000) 
+1420 12028B     297            lcall xchg_xy
+1423 1200F4     297            lcall sub32
+1426            297   ; x now contains the reload value
+1426            297   ;debug_BCD
+1426 8530F2     297            mov RL0, x+0
+1429 8531F4     297            mov RH0, x+1
+142C            297            
+142C D28C       297            setb TR0
+142E            297            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+142E 7A04       297            mov R2, #4
+1430 12038E     297            lcall Play_Note_Delay
+1433 C28C       297            clr TR0
+1435 C002       297            push AR2
+1437 7A14       297            mov R2, #20
+1439 1202AF     297            lcall ?Wait_Milli_Seconds
+143C D002       297            pop AR2         ;B5
+143E            298            ; Compute the reload value given the base frequency and interval ratio codes
+143E            298   ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
+143E            298   ;Calc_Interval:
+143E            298   ; Freq0 loaded (fundamental frequency)
+143E 753070     298            mov x+0, #low (key_A5 % 0x10000) 
+1441 753103     298            mov x+1, #high(key_A5 % 0x10000) 
+1444 753200     298            mov x+2, #low (key_A5 / 0x10000) 
+1447 753300     298            mov x+3, #high(key_A5 / 0x10000)  
+144A            298   ; Load upper ratio
+144A 753401     298            mov y+0, #low (tone_p1a % 0x10000) 
+144D 753500     298            mov y+1, #high(tone_p1a % 0x10000) 
+1450 753600     298            mov y+2, #low (tone_p1a / 0x10000) 
+1453 753700     298            mov y+3, #high(tone_p1a / 0x10000) 
+1456 120188     298            lcall mul32
+1459            298            
+1459            298   ; Load lower ratio
+1459 753401     298            mov y+0, #low (tone_p1b % 0x10000) 
+145C 753500     298            mov y+1, #high(tone_p1b % 0x10000) 
+145F 753600     298            mov y+2, #low (tone_p1b / 0x10000) 
+1462 753700     298            mov y+3, #high(tone_p1b / 0x10000) 
+1465 120215     298            lcall div32
+1468            298   ; compute value for reload
+1468            298   ; reload rate = CLK/freq
+1468 753400     298            mov y+0, #low (CLK % 0x10000) 
+146B 753580     298            mov y+1, #high(CLK % 0x10000) 
+146E 753651     298            mov y+2, #low (CLK / 0x10000) 
+1471 753701     298            mov y+3, #high(CLK / 0x10000) 
+1474 12028B     298            lcall xchg_xy
+1477            298            
+1477 120215     298            lcall div32
+147A            298            
+147A            298   ; reload value = 65536-x
+147A 753400     298            mov y+0, #low (65536 % 0x10000) 
+147D 753500     298            mov y+1, #high(65536 % 0x10000) 
+1480 753601     298            mov y+2, #low (65536 / 0x10000) 
+1483 753700     298            mov y+3, #high(65536 / 0x10000) 
+1486 12028B     298            lcall xchg_xy
+1489 1200F4     298            lcall sub32
+148C            298   ; x now contains the reload value
+148C            298   ;debug_BCD
+148C 8530F2     298            mov RL0, x+0
+148F 8531F4     298            mov RH0, x+1
+1492            298            
+1492 D28C       298            setb TR0
+1494            298            ; Note delay runs 50 ms according to the value held in register 2 (parameter 4)
+1494 7A08       298            mov R2, #8
+1496 12038E     298            lcall Play_Note_Delay
+1499 C28C       298            clr TR0
+149B C002       298            push AR2
+149D 7A14       298            mov R2, #20
+149F 1202AF     298            lcall ?Wait_Milli_Seconds
+14A2 D002       298            pop AR2         ;A5
+14A4            299            
+14A4 0203E8     300            ljmp forever
+14A7            301            
+14A7            302            
+14A7            303            
+14A7            304            
+14A7            305            
+14A7 12039A     306            lcall Note_Stop
+14AA C28C       307            clr TR0
+14AC 75F4BD     308            mov RH0, #high(TIMER0_RELOADFS)
+14AF 75F28A     309            mov RL0, #low(TIMER0_RELOADFS)
+14B2 D28C       310            setb TR0
+14B4            311            
+14B4 12039A     312            lcall Note_Stop
+14B7 C28C       313            clr TR0
+14B9            314            
+14B9 12039A     315            lcall Note_Stop
+14BC C28C       316            clr TR0
+14BE 75F4BD     317            mov RH0, #high(TIMER0_RELOADFS)
+14C1 75F28A     318            mov RL0, #low(TIMER0_RELOADFS)
+14C4 D28C       319            setb TR0
+14C6            320            
+14C6 12039A     321            lcall Note_Stop
+14C9 C28C       322            clr TR0
+14CB            323            
+14CB 12039A     324            lcall Note_Stop
+14CE C28C       325            clr TR0
+14D0 75F4B6     326            mov RH0, #high(TIMER0_RELOADE)
+14D3 75F278     327            mov RL0, #low(TIMER0_RELOADE)
+14D6 D28C       328            setb TR0
+14D8 12039A     329            lcall Note_Stop
+14DB            330            
+14DB 12039A     331            lcall Note_Stop
+14DE C28C       332            clr TR0
+14E0            333            
+14E0 12039A     334            lcall Note_Stop
+14E3 C28C       335            clr TR0
+14E5 75F4AD     336            mov RH0, #high(TIMER0_RELOADD)
+14E8 75F2B8     337            mov RL0, #low(TIMER0_RELOADD)
+14EB D28C       338            setb TR0
+14ED            339            
+14ED 12039A     340            lcall Note_Stop
+14F0 C28C       341            clr TR0
+14F2            342            
+14F2 12039A     343            lcall Note_Stop
+14F5 C28C       344            clr TR0
+14F7 75F4AD     345            mov RH0, #high(TIMER0_RELOADD)
+14FA 75F2B8     346            mov RL0, #low(TIMER0_RELOADD)
+14FD D28C       347            setb TR0
+14FF            348            
+14FF 12039A     349            lcall Note_Stop
+1502 C28C       350            clr TR0
+1504            351            
+1504 12039A     352            lcall Note_Stop
+1507 C28C       353            clr TR0
+1509 75F4A9     354            mov RH0, #high(TIMER0_RELOADCS)
+150C 75F29A     355            mov RL0, #low(TIMER0_RELOADCS)
+150F D28C       356            setb TR0
+1511            357            
+1511 12039A     358            lcall Note_Stop
+1514 C28C       359            clr TR0
+1516            360            
+1516 12039A     361            lcall Note_Stop
+1519 C28C       362            clr TR0
+151B 75F4A9     363            mov RH0, #high(TIMER0_RELOADCS)
+151E 75F29A     364            mov RL0, #low(TIMER0_RELOADCS)
+1521 D28C       365            setb TR0
+1523            366            
+1523 12039A     367            lcall Note_Stop
+1526 C28C       368            clr TR0
+1528            369            
+1528 12039A     370            lcall Note_Stop
+152B C28C       371            clr TR0
+152D 75F49E     372            mov RH0, #high(TIMER0_RELOADB)
+1530 75F2EC     373            mov RL0, #low(TIMER0_RELOADB)
+1533 D28C       374            setb TR0
+1535            375            
+1535 12039A     376            lcall Note_Stop
+1538 C28C       377            clr TR0
+153A            378            
+153A 12039A     379            lcall Note_Stop
+153D C28C       380            clr TR0
+153F 75F49E     381            mov RH0, #high(TIMER0_RELOADB)
+1542 75F2EC     382            mov RL0, #low(TIMER0_RELOADB)
+1545 D28C       383            setb TR0
+1547            384            
+1547 12039A     385            lcall Note_Stop
+154A C28C       386            clr TR0
+154C            387            
+154C 12039A     388            lcall Note_Stop
+154F C28C       389            clr TR0
+1551 75F49D     390            mov RH0, #high(TIMER0_RELOADA)
+1554 75F2D2     391            mov RL0, #low(TIMER0_RELOADA)
+1557 D28C       392            setb TR0
+1559 12039A     393            lcall Note_Stop
+155C            394            
+155C 12039A     395            lcall Note_Stop
+155F C28C       396            clr TR0
+1561            397            
+1561 0203E8     398       ljmp forever ; Repeat! 
+1564            399   
+1564            400   end

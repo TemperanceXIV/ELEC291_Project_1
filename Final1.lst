@@ -761,15 +761,15 @@
 085D            591   ;   lcall Timer0_Init
 085D E553       592            mov a, Player1Counter
 085F B40403     593            cjne a, #0x04, NoWinner1
-0862 020B10     594            ljmp GameOver
+0862 020B12     594            ljmp Player1Wins
 0865            595   NoWinner1:
 0865 E557       596            mov a, Player2Counter
 0867 B40403     597            cjne a, #0x04, NoWinner2
-086A 020B6B     598            ljmp Player2Wins
+086A 020B69     598            ljmp Player2Wins
 086D            599   NoWinner2:
 086D E55B       600            mov a, Player3Counter
 086F B40403     601            cjne a, #0x04, NoWinner3
-0872 020BC4     602            ljmp Player3Wins
+0872 020BC0     602            ljmp Player3Wins
 0875            603   NoWinner3:
 0875 E55F       604            mov a, Player4Counter
 0877 B40403     605            cjne a, #0x04, NoWinner4
@@ -1136,136 +1136,136 @@
 0B10            854   
 0B10            855   GameOver:
 0B10 B28C       856       cpl TR0
-0B12 E553       857            mov a, Player1Counter
-0B14            858            ;cjne a, #0x04, Player2Wins
-0B14            859            
-0B14 C0E0       860            push acc
-0B16 740F       860            mov a, #15
-0B18 14         860            dec a
-0B19 1200BF     860            lcall ?Set_Cursor_1 ; Select column and row
-0B1C D0E0       860            pop acc
-0B1E C083       861            push dph
-0B20 C082       861            push dpl
-0B22 C0E0       861            push acc
-0B24 9003CB     861            mov dptr, #BlankSpace
-0B27 1200B2     861            lcall ?Send_Constant_String
-0B2A D0E0       861            pop acc
-0B2C D082       861            pop dpl
-0B2E D083       861            pop dph
-0B30 C0E0       862            push acc
-0B32 7401       862            mov a, #1
-0B34 14         862            dec a
-0B35 1200BD     862            lcall ?Set_Cursor_2 ; Select column and row
-0B38 D0E0       862            pop acc
-0B3A C083       863            push dph
-0B3C C082       863            push dpl
-0B3E C0E0       863            push acc
-0B40 9003CE     863            mov dptr, #BlankRow
-0B43 1200B2     863            lcall ?Send_Constant_String
-0B46 D0E0       863            pop acc
-0B48 D082       863            pop dpl
-0B4A D083       863            pop dph
-0B4C C0E0       864            push acc
-0B4E 7401       864            mov a, #1
-0B50 14         864            dec a
-0B51 1200BF     864            lcall ?Set_Cursor_1 ; Select column and row
-0B54 D0E0       864            pop acc
-0B56 C083       865            push dph
-0B58 C082       865            push dpl
-0B5A C0E0       865            push acc
-0B5C 900392     865            mov dptr, #EndMessage1
-0B5F 1200B2     865            lcall ?Send_Constant_String
-0B62 D0E0       865            pop acc
-0B64 D082       865            pop dpl
-0B66 D083       865            pop dph
-0B68 020C18     866            ljmp DeadEnd
-0B6B            867   Player2Wins:
-0B6B            868            
-0B6B E557       869            mov a, Player2Counter
-0B6D            870            ;cjne a, #0x04, Player3Wins
-0B6D C0E0       871            push acc
-0B6F 740F       871            mov a, #15
-0B71 14         871            dec a
-0B72 1200BF     871            lcall ?Set_Cursor_1 ; Select column and row
-0B75 D0E0       871            pop acc
-0B77 C083       872            push dph
-0B79 C082       872            push dpl
-0B7B C0E0       872            push acc
-0B7D 9003CB     872            mov dptr, #BlankSpace
-0B80 1200B2     872            lcall ?Send_Constant_String
-0B83 D0E0       872            pop acc
-0B85 D082       872            pop dpl
-0B87 D083       872            pop dph
-0B89 C0E0       873            push acc
-0B8B 7401       873            mov a, #1
-0B8D 14         873            dec a
-0B8E 1200BD     873            lcall ?Set_Cursor_2 ; Select column and row
-0B91 D0E0       873            pop acc
-0B93 C083       874            push dph
-0B95 C082       874            push dpl
-0B97 C0E0       874            push acc
-0B99 9003CE     874            mov dptr, #BlankRow
-0B9C 1200B2     874            lcall ?Send_Constant_String
-0B9F D0E0       874            pop acc
-0BA1 D082       874            pop dpl
-0BA3 D083       874            pop dph
-0BA5 C0E0       875            push acc
-0BA7 7401       875            mov a, #1
-0BA9 14         875            dec a
-0BAA 1200BF     875            lcall ?Set_Cursor_1 ; Select column and row
-0BAD D0E0       875            pop acc
-0BAF C083       876            push dph
-0BB1 C082       876            push dpl
-0BB3 C0E0       876            push acc
-0BB5 9003A1     876            mov dptr, #EndMessage2
-0BB8 1200B2     876            lcall ?Send_Constant_String
-0BBB D0E0       876            pop acc
-0BBD D082       876            pop dpl
-0BBF D083       876            pop dph
-0BC1 020C18     877            ljmp DeadEnd
-0BC4            878            
-0BC4            879   Player3Wins:
-0BC4 C0E0       880            push acc
-0BC6 740F       880            mov a, #15
-0BC8 14         880            dec a
-0BC9 1200BF     880            lcall ?Set_Cursor_1 ; Select column and row
-0BCC D0E0       880            pop acc
-0BCE C083       881            push dph
-0BD0 C082       881            push dpl
-0BD2 C0E0       881            push acc
-0BD4 9003CB     881            mov dptr, #BlankSpace
-0BD7 1200B2     881            lcall ?Send_Constant_String
-0BDA D0E0       881            pop acc
-0BDC D082       881            pop dpl
-0BDE D083       881            pop dph
-0BE0 C0E0       882            push acc
-0BE2 7401       882            mov a, #1
-0BE4 14         882            dec a
-0BE5 1200BD     882            lcall ?Set_Cursor_2 ; Select column and row
-0BE8 D0E0       882            pop acc
-0BEA C083       883            push dph
-0BEC C082       883            push dpl
-0BEE C0E0       883            push acc
-0BF0 9003CE     883            mov dptr, #BlankRow
-0BF3 1200B2     883            lcall ?Send_Constant_String
-0BF6 D0E0       883            pop acc
-0BF8 D082       883            pop dpl
-0BFA D083       883            pop dph
-0BFC C0E0       884            push acc
-0BFE 7401       884            mov a, #1
-0C00 14         884            dec a
-0C01 1200BF     884            lcall ?Set_Cursor_1 ; Select column and row
-0C04 D0E0       884            pop acc
-0C06 C083       885            push dph
-0C08 C082       885            push dpl
-0C0A C0E0       885            push acc
-0C0C 9003B0     885            mov dptr, #EndMessage3
-0C0F 1200B2     885            lcall ?Send_Constant_String
-0C12 D0E0       885            pop acc
-0C14 D082       885            pop dpl
-0C16 D083       885            pop dph
-0C18            886            
-0C18            887   DeadEnd:
-0C18 120754     888       lcall Victory_Song
-0C1B 12059D     889       lcall Victory_Song2
-0C1E            890   end
+0B12            857            ;mov a, Player1Counter
+0B12            858            ;cjne a, #0x04, Player2Wins
+0B12            859   Player1Wins:
+0B12 C0E0       860            push acc
+0B14 740F       860            mov a, #15
+0B16 14         860            dec a
+0B17 1200BF     860            lcall ?Set_Cursor_1 ; Select column and row
+0B1A D0E0       860            pop acc
+0B1C C083       861            push dph
+0B1E C082       861            push dpl
+0B20 C0E0       861            push acc
+0B22 9003CB     861            mov dptr, #BlankSpace
+0B25 1200B2     861            lcall ?Send_Constant_String
+0B28 D0E0       861            pop acc
+0B2A D082       861            pop dpl
+0B2C D083       861            pop dph
+0B2E C0E0       862            push acc
+0B30 7401       862            mov a, #1
+0B32 14         862            dec a
+0B33 1200BD     862            lcall ?Set_Cursor_2 ; Select column and row
+0B36 D0E0       862            pop acc
+0B38 C083       863            push dph
+0B3A C082       863            push dpl
+0B3C C0E0       863            push acc
+0B3E 9003CE     863            mov dptr, #BlankRow
+0B41 1200B2     863            lcall ?Send_Constant_String
+0B44 D0E0       863            pop acc
+0B46 D082       863            pop dpl
+0B48 D083       863            pop dph
+0B4A C0E0       864            push acc
+0B4C 7401       864            mov a, #1
+0B4E 14         864            dec a
+0B4F 1200BF     864            lcall ?Set_Cursor_1 ; Select column and row
+0B52 D0E0       864            pop acc
+0B54 C083       865            push dph
+0B56 C082       865            push dpl
+0B58 C0E0       865            push acc
+0B5A 900392     865            mov dptr, #EndMessage1
+0B5D 1200B2     865            lcall ?Send_Constant_String
+0B60 D0E0       865            pop acc
+0B62 D082       865            pop dpl
+0B64 D083       865            pop dph
+0B66 020C14     866            ljmp DeadEnd
+0B69            867   Player2Wins:
+0B69            868            
+0B69            869            ;mov a, Player2Counter
+0B69            870            ;cjne a, #0x04, Player3Wins
+0B69 C0E0       871            push acc
+0B6B 740F       871            mov a, #15
+0B6D 14         871            dec a
+0B6E 1200BF     871            lcall ?Set_Cursor_1 ; Select column and row
+0B71 D0E0       871            pop acc
+0B73 C083       872            push dph
+0B75 C082       872            push dpl
+0B77 C0E0       872            push acc
+0B79 9003CB     872            mov dptr, #BlankSpace
+0B7C 1200B2     872            lcall ?Send_Constant_String
+0B7F D0E0       872            pop acc
+0B81 D082       872            pop dpl
+0B83 D083       872            pop dph
+0B85 C0E0       873            push acc
+0B87 7401       873            mov a, #1
+0B89 14         873            dec a
+0B8A 1200BD     873            lcall ?Set_Cursor_2 ; Select column and row
+0B8D D0E0       873            pop acc
+0B8F C083       874            push dph
+0B91 C082       874            push dpl
+0B93 C0E0       874            push acc
+0B95 9003CE     874            mov dptr, #BlankRow
+0B98 1200B2     874            lcall ?Send_Constant_String
+0B9B D0E0       874            pop acc
+0B9D D082       874            pop dpl
+0B9F D083       874            pop dph
+0BA1 C0E0       875            push acc
+0BA3 7401       875            mov a, #1
+0BA5 14         875            dec a
+0BA6 1200BF     875            lcall ?Set_Cursor_1 ; Select column and row
+0BA9 D0E0       875            pop acc
+0BAB C083       876            push dph
+0BAD C082       876            push dpl
+0BAF C0E0       876            push acc
+0BB1 9003A1     876            mov dptr, #EndMessage2
+0BB4 1200B2     876            lcall ?Send_Constant_String
+0BB7 D0E0       876            pop acc
+0BB9 D082       876            pop dpl
+0BBB D083       876            pop dph
+0BBD 020C14     877            ljmp DeadEnd
+0BC0            878            
+0BC0            879   Player3Wins:
+0BC0 C0E0       880            push acc
+0BC2 740F       880            mov a, #15
+0BC4 14         880            dec a
+0BC5 1200BF     880            lcall ?Set_Cursor_1 ; Select column and row
+0BC8 D0E0       880            pop acc
+0BCA C083       881            push dph
+0BCC C082       881            push dpl
+0BCE C0E0       881            push acc
+0BD0 9003CB     881            mov dptr, #BlankSpace
+0BD3 1200B2     881            lcall ?Send_Constant_String
+0BD6 D0E0       881            pop acc
+0BD8 D082       881            pop dpl
+0BDA D083       881            pop dph
+0BDC C0E0       882            push acc
+0BDE 7401       882            mov a, #1
+0BE0 14         882            dec a
+0BE1 1200BD     882            lcall ?Set_Cursor_2 ; Select column and row
+0BE4 D0E0       882            pop acc
+0BE6 C083       883            push dph
+0BE8 C082       883            push dpl
+0BEA C0E0       883            push acc
+0BEC 9003CE     883            mov dptr, #BlankRow
+0BEF 1200B2     883            lcall ?Send_Constant_String
+0BF2 D0E0       883            pop acc
+0BF4 D082       883            pop dpl
+0BF6 D083       883            pop dph
+0BF8 C0E0       884            push acc
+0BFA 7401       884            mov a, #1
+0BFC 14         884            dec a
+0BFD 1200BF     884            lcall ?Set_Cursor_1 ; Select column and row
+0C00 D0E0       884            pop acc
+0C02 C083       885            push dph
+0C04 C082       885            push dpl
+0C06 C0E0       885            push acc
+0C08 9003B0     885            mov dptr, #EndMessage3
+0C0B 1200B2     885            lcall ?Send_Constant_String
+0C0E D0E0       885            pop acc
+0C10 D082       885            pop dpl
+0C12 D083       885            pop dph
+0C14            886            
+0C14            887   DeadEnd:
+0C14 120754     888       lcall Victory_Song
+0C17 12059D     889       lcall Victory_Song2
+0C1A            890   end

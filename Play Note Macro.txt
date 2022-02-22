@@ -1,0 +1,22 @@
+
+; Plays a note for a certain duration
+; Parameter 1, select note
+; Parameter 2 select duration of note (in miliseconds as it is going off a pure delay
+; The basic time increment is 0.05 seconds
+Play_Note mac
+	push acc
+	push AR2
+	mov R2, %1
+
+	clr TR0
+	mov RL0, #high(%0)
+	mov RL0, #low(%0)
+	setb TR0
+
+Play_Note_Wait:
+	Wait_Milli_Seconds(#50)
+djnz R2, Play_Note_Wait
+	pop AR2
+	pop acc
+endmac
+
