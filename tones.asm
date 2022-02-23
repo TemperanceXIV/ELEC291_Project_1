@@ -26,8 +26,21 @@ TIMER0_RELOADB EQU ((65536-(CLK/TIMER0_RATEB)))
 
 ; notes are calibrated to be input directly into the Play_Note macro?
 ; Using an interval system with math.
+key_C5	equ 523		; C5 = 523.23 Hz
+key_D5f equ 554		; D5f = 554.37 Hz
+key_D5 equ 587		; D5 = 587.33 Hz
+key_E5f equ 622		; E5f = 622.25 Hz
+key_E5 equ 659		; E5 = 659.25 Hz
+key_F5 equ 698		; F5 = 698.46
+key_G5f	equ 740		; G5f = 739.99 Hz
+key_G5	equ 784		; G5 = 783.99 Hz
+key_A5f equ 831		; A5f = 830.61 Hz
 key_A5 	equ 880		; A5 = 880 Hz, CLK/(440*8) = 62817.727272...
 key_B5f equ 932		; B5f = 932.33333?
+key_B5 equ 988		; B5 = 987.77 Hz
+key_C6 equ 1047		; C6 =  1046 Hz
+key_C7 equ 2093		; C7 = 	2093 Hz
+key_C8 equ 4186		; C8 = 4186.01 Hz
 
 ; Unison: 1:1
 tone_P1a 	equ 1
@@ -180,6 +193,7 @@ Play_Note mac
 ; Calc_Interval([fundamental frequency], [Numerator], [Denominator])
 ;Calc_Interval:
 ; Freq0 loaded (fundamental frequency)
+push AR2
 Load_x(%0) 
 ; Load upper ratio
 Load_y(%1)
@@ -209,16 +223,29 @@ Load_y(%2)
 	mov R2, %3
 	lcall Play_Note_Delay
 	clr TR0
-	Wait_Milli_Seconds(#20)
+	Wait_Milli_Seconds(#10)
+	pop AR2
 endmac
+
+; Rest Macro Note_Rest([duration])
+; Given in terms of 16th rests
+Note_Rest mac
+push AR2
+mov R2, %0
+lcall Play_Note_Delay
+pop AR2
+endmac
+
 
 ; Based on TEMPO of music?
 ; Set based on the smallest time interval note.
 ; Moderato is about (108)-120 bpm
 ; a 16th note is worth 1/4 of a beat
 ; at modrato, a 16th note is held for 138.8888 ms
+
+; Allegro is 125 ms at 120 bpm
 Play_Note_Delay:
-	Wait_Milli_Seconds(#139)
+	Wait_Milli_Seconds(#70)
 djnz R2, Play_Note_Delay
 ret
 
@@ -243,158 +270,128 @@ Startup:
 	
 forever:
 	;lcall Note_Stop
-	Play_Note(key_A5, tone_p1a, tone_p1b, #4)	;A5
-	Play_Note(key_A5, tone_p1a, tone_p1b, #4)	;A5
-	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
-	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
-	
-	Play_Note(key_A5, tone_ma6a, tone_ma6b,#4)	;F5
-	Play_Note(key_A5, tone_ma6a, tone_ma6b,#4)	;F5
-	Play_Note(key_A5, tone_p5a, tone_p5b, #8)	;E5
-	
-	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
-	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
-	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
-	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
-	
-	Play_Note(key_A5, tone_ma2a, tone_ma2b, #4)	;B5
-	Play_Note(key_A5, tone_ma2a, tone_ma2b, #4)	;B5
-	Play_Note(key_A5, tone_p1a, tone_p1b, #8)	;A5
-	
-	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
-	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
-	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
-	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
-	
-	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
-	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
-	Play_Note(key_A5, tone_ma2a, tone_ma2b, #8)	;B5
-	
-	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
-	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
-	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
-	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
-	
-	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
-	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
-	Play_Note(key_A5, tone_ma2a, tone_ma2b, #8)	;B5
-	
-	Play_Note(key_A5, tone_p1a, tone_p1b, #4)	;A5
-	Play_Note(key_A5, tone_p1a, tone_p1b, #4)	;A5
-	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
-	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
-	
-	Play_Note(key_A5, tone_ma6a, tone_ma6b,#4)	;F5
-	Play_Note(key_A5, tone_ma6a, tone_ma6b,#4)	;F5
-	Play_Note(key_A5, tone_p5a, tone_p5b, #8)	;E5
-	
-	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
-	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
-	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
-	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
-	
-	Play_Note(key_A5, tone_ma2a, tone_ma2b, #4)	;B5
-	Play_Note(key_A5, tone_ma2a, tone_ma2b, #4)	;B5
-	Play_Note(key_A5, tone_p1a, tone_p1b, #8)	;A5
-	
-	ljmp forever
-	
-	
-	
-	
-	
-	lcall Note_Stop
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADFS)
-	mov RL0, #low(TIMER0_RELOADFS)
-	setb TR0
-	
-	lcall Note_Stop
-	clr TR0
-	
-	lcall Note_Stop
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADFS)
-	mov RL0, #low(TIMER0_RELOADFS)
-	setb TR0
-	
-	lcall Note_Stop
-	clr TR0
-	
-	lcall Note_Stop
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADE)
-	mov RL0, #low(TIMER0_RELOADE)
-	setb TR0
-	lcall Note_Stop
-	
-	lcall Note_Stop
-	clr TR0
-	
-	lcall Note_Stop
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADD)
-	mov RL0, #low(TIMER0_RELOADD)
-	setb TR0
-	
-	lcall Note_Stop
-	clr TR0
-	
-	lcall Note_Stop
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADD)
-	mov RL0, #low(TIMER0_RELOADD)
-	setb TR0
-	
-	lcall Note_Stop
-	clr TR0
-	
-	lcall Note_Stop
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADCS)
-	mov RL0, #low(TIMER0_RELOADCS)
-	setb TR0
-	
-	lcall Note_Stop
-	clr TR0
-	
-	lcall Note_Stop
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADCS)
-	mov RL0, #low(TIMER0_RELOADCS)
-	setb TR0
-	
-	lcall Note_Stop
-	clr TR0
-	
-	lcall Note_Stop
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADB)
-	mov RL0, #low(TIMER0_RELOADB)
-	setb TR0
-	
-	lcall Note_Stop
-	clr TR0
-	
-	lcall Note_Stop
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADB)
-	mov RL0, #low(TIMER0_RELOADB)
-	setb TR0
-	
-	lcall Note_Stop
-	clr TR0
-	
-	lcall Note_Stop
-	clr TR0
-	mov RH0, #high(TIMER0_RELOADA)
-	mov RL0, #low(TIMER0_RELOADA)
-	setb TR0
-	lcall Note_Stop
-	
-	lcall Note_Stop
-	clr TR0
-	
+; The Entertainer
+; By Scott Joplin
+
+; Introduction
+Play_Note(key_C7, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C7, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C7, tone_p1a, tone_p1b, #2)
+Play_Note(key_C7, tone_mi3b, tone_mi3a, #4)
+Play_Note(key_C7, tone_mi2b, tone_mi2a, #2)
+Play_Note(key_C7, tone_p4b, tone_p4a, #4)
+
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_mi3b, tone_mi3a, #4)
+Play_Note(key_C6, tone_mi2b, tone_mi2a, #2)
+Play_Note(key_C6, tone_p4b, tone_p4a, #4)
+
+Play_Note(key_C5, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C5, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C5, tone_p1a, tone_p1b, #2)
+Play_Note(key_C5, tone_mi3b, tone_mi3a, #4)
+Play_Note(key_C5, tone_mi2b, tone_mi2a, #2)
+Play_Note(key_C5, tone_mi3b, tone_mi3a, #2)
+Play_Note(key_C5, tone_ma3b, tone_ma3a, #2)
+Play_Note(key_C5, tone_p4b, tone_p4a, #4)
+Note_Rest(#4)
+
+; Chorus
+Play_Note(key_C5, tone_p5a, tone_p5b, #4)
+Play_Note(key_C5, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C5, tone_mi3a, tone_mi3b, #2)
+Play_Note(key_C5, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C5, tone_p8a, tone_p8b, #4)
+Play_Note(key_C5, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C5, tone_p8a, tone_p8b, #4)
+Play_Note(key_C5, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C5, tone_p8a, tone_p8b, #12)
+Note_Rest(#2)
+
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_mi3a, tone_mi3b, #2)
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #4)
+Play_Note(key_C6, tone_mi2b, tone_mi2a, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #4)
+Play_Note(key_C6, tone_p1a, tone_p1b, #12)
+
+Play_Note(key_C5, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C5, tone_mi3a, tone_mi3b, #2)
+Play_Note(key_C5, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C5, tone_p8a, tone_p8b, #4)
+Play_Note(key_C5, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C5, tone_p8a, tone_p8b, #4)
+Play_Note(key_C5, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C5, tone_p8a, tone_p8b, #12)
+
+Play_Note(key_C5, tone_ma6a, tone_ma6b, #2)
+Play_Note(key_C5, tone_p5a, tone_p5b, #2)
+Play_Note(key_C5, tone_tta, tone_ttb, #2)
+Play_Note(key_C5, tone_ma6a, tone_ma6b, #2)
+Play_Note(key_C5, tone_p8a, tone_p8b, #2)
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #4)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_mi3b, tone_mi3a, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #12)
+
+Play_Note(key_C5, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C5, tone_mi3a, tone_mi3b, #2)
+Play_Note(key_C5, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C5, tone_p8a, tone_p8b, #4)
+Play_Note(key_C5, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C5, tone_p8a, tone_p8b, #4)
+Play_Note(key_C5, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C5, tone_p8a, tone_p8b, #12)
+
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_mi3a, tone_mi3b, #2)
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #4)
+Play_Note(key_C6, tone_mi2b, tone_mi2a, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #4)
+Play_Note(key_C6, tone_p1a, tone_p1b, #12)
+
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #4)
+
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #4)
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #2)
+Play_Note(key_C6, tone_p1a, tone_p1b, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #2)
+Play_Note(key_C6, tone_ma3a, tone_ma3b, #4)
+
+Play_Note(key_C6, tone_mi2b, tone_mi2a, #2)
+Play_Note(key_C6, tone_ma2a, tone_ma2b, #4)
+Play_Note(key_C6, tone_p1a, tone_p1b, #12)
+Note_Rest(#4)
+
+
+
     ljmp forever ; Repeat! 
 
 end

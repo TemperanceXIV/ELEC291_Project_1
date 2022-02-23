@@ -1,0 +1,54 @@
+;;Now in a differnt key B flat major (5)
+	Play_Note(key_B5f, tone_p1a, tone_p1b, #4)	;Bf5
+	Play_Note(key_B5f, tone_p1a, tone_p1b, #4)	;Bf5
+	Play_Note(key_B5f, tone_p5a, tone_p5b, #4)	;F5
+	Play_Note(key_B5f, tone_p5a, tone_p5b, #4)	;F5
+	
+	Play_Note(key_B5f, tone_ma6a, tone_ma6b,#4)	;G5
+	Play_Note(key_B5f, tone_ma6a, tone_ma6b,#4)	;G5
+	Play_Note(key_B5f, tone_p5a, tone_p5b, #8)	;F5
+	
+	Play_Note(key_B5f, tone_p4a, tone_p4b, #4)	;Ef5
+	Play_Note(key_B5f, tone_p4a, tone_p4b, #4)	;Ef5
+	Play_Note(key_B5f, tone_ma3a, tone_ma3b, #4)	;D5
+	Play_Note(key_B5f, tone_ma3a, tone_ma3b, #4)	;D5
+	
+	Play_Note(key_B5f, tone_ma2a, tone_ma2b, #4)	;C5
+	Play_Note(key_B5f, tone_ma2a, tone_ma2b, #4)	;C5
+	Play_Note(key_B5f, tone_p1a, tone_p1b, #8)	;Bf5
+	
+	Play_Note(key_B5f, tone_p5a, tone_p5b, #4)	;F5
+	Play_Note(key_B5f, tone_p5a, tone_p5b, #4)	;F5
+	Play_Note(key_B5f, tone_p4a, tone_p4b, #4)	;Ef5
+	Play_Note(key_B5f, tone_p4a, tone_p4b, #4)	;Ef5
+	
+	Play_Note(key_B5f, tone_ma3a, tone_ma3b, #4)	;D5
+	Play_Note(key_B5f, tone_ma3a, tone_ma3b, #4)	;D5
+	Play_Note(key_B5f, tone_ma2a, tone_ma2b, #8)	;C5
+	
+	Play_Note(key_B5f, tone_p5a, tone_p5b, #4)	;F5
+	Play_Note(key_B5f, tone_p5a, tone_p5b, #4)	;F5
+	Play_Note(key_B5f, tone_p4a, tone_p4b, #4)	;Ef5
+	Play_Note(key_B5f, tone_p4a, tone_p4b, #4)	;Ef5
+	
+	Play_Note(key_B5f, tone_ma3a, tone_ma3b, #4)	;D5
+	Play_Note(key_B5f, tone_ma3a, tone_ma3b, #4)	;D5
+	Play_Note(key_B5f, tone_ma2a, tone_ma2b, #8)	;C5
+	
+	Play_Note(key_B5f, tone_p1a, tone_p1b, #4)	;Bf5
+	Play_Note(key_B5f, tone_p1a, tone_p1b, #4)	;Bf5
+	Play_Note(key_B5f, tone_p5a, tone_p5b, #4)	;F5
+	Play_Note(key_B5f, tone_p5a, tone_p5b, #4)	;F5
+	
+	Play_Note(key_B5f, tone_ma6a, tone_ma6b,#4)	;G5
+	Play_Note(key_B5f, tone_ma6a, tone_ma6b,#4)	;G5
+	Play_Note(key_B5f, tone_p5a, tone_p5b, #8)	;F5
+	
+	Play_Note(key_B5f, tone_p4a, tone_p4b, #4)	;Ef5
+	Play_Note(key_B5f, tone_p4a, tone_p4b, #4)	;Ef5
+	Play_Note(key_B5f, tone_ma3a, tone_ma3b, #4)	;D5
+	Play_Note(key_B5f, tone_ma3a, tone_ma3b, #4)	;D5
+	
+	Play_Note(key_B5f, tone_ma2a, tone_ma2b, #4)	;C5
+	Play_Note(key_B5f, tone_ma2a, tone_ma2b, #4)	;C5
+	Play_Note(key_B5f, tone_p1a, tone_p1b, #8)	;Bf5

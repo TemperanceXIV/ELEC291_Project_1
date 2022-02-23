@@ -1,0 +1,57 @@
+; Play_Note([key], [first ratio], [second ratio], [note duration])
+; notes are calibrated to be input directly into the Play_Note macro?
+; Using an interval system with math.
+key_C5	equ 523		; C5 = 523.23 Hz
+key_D5f equ 554		; D5f = 554.37 Hz
+key_D5 equ 587		; D5 = 587.33 Hz
+key_E5f equ 622		; E5f = 622.25 Hz
+key_E5 equ 659		; E5 = 659.25 Hz
+key_F5 equ 698		; F5 = 698.46
+key_G5f	equ 740		; G5f = 739.99 Hz
+key_G5	equ 784		; G5 = 783.99 Hz
+key_A5f equ 831		; A5f = 830.61 Hz
+key_A5 	equ 880		; A5 = 880 Hz, CLK/(440*8) = 62817.727272...
+key_B5f equ 932		; B5f = 932.33333?
+key_B5 equ 988		; B5 = 987.77 Hz
+key_C6 equ 1047		; C6 =  1046 Hz
+
+; Unison: 1:1
+tone_P1a 	equ 1
+tone_P1b	equ 1
+; Minor Second is 16:15
+tone_mi2a 	equ 16
+tone_mi2b	equ	15
+; Major Second: 9:8
+tone_Ma2a	equ 9
+tone_Ma2b	equ	8
+; Minor Third: 6:5
+tone_mi3a	equ 6
+tone_mi3b	equ 5
+; Major Third: 5:4
+tone_Ma3a	equ 5
+tone_Ma3b	equ 4
+; Perfect Fourth: 4:3
+tone_P4a	equ 4
+tone_P4b	equ 3
+; Tritone: 7:5
+tone_tta	equ 7
+tone_ttb	equ 5
+; Perfect Fifth: 3:2
+tone_P5a	equ 3
+tone_P5b	equ 2
+; Minor Sixth: 8:5
+tone_mi6a	equ 8
+tone_mi6b	equ 5
+; Major Sixth: 5:3
+tone_Ma6a	equ 5
+tone_Ma6b	equ 3
+; Minor Seventh: 9:5
+tone_mi7a	equ 9
+tone_mi7b	equ 5
+; Major Seventh: 15:8
+tone_Ma7a	equ 15
+tone_Ma7b 	equ 8
+; Octave: 2:1
+tone_P8a	equ 2
+tone_P8b	equ 1
+

@@ -1,0 +1,55 @@
+Play_Note(key_A5, tone_p1a, tone_p1b, #4)	;A5
+	Play_Note(key_A5, tone_p1a, tone_p1b, #4)	;A5
+	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
+	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
+	
+	Play_Note(key_A5, tone_ma6a, tone_ma6b,#4)	;F5
+	Play_Note(key_A5, tone_ma6a, tone_ma6b,#4)	;F5
+	Play_Note(key_A5, tone_p5a, tone_p5b, #8)	;E5
+	
+	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
+	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
+	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
+	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
+	
+	Play_Note(key_A5, tone_ma2a, tone_ma2b, #4)	;B5
+	Play_Note(key_A5, tone_ma2a, tone_ma2b, #4)	;B5
+	Play_Note(key_A5, tone_p1a, tone_p1b, #8)	;A5
+	
+	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
+	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
+	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
+	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
+	
+	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
+	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
+	Play_Note(key_A5, tone_ma2a, tone_ma2b, #8)	;B5
+	
+	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
+	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
+	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
+	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
+	
+	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
+	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
+	Play_Note(key_A5, tone_ma2a, tone_ma2b, #8)	;B5
+	
+	Play_Note(key_A5, tone_p1a, tone_p1b, #4)	;A5
+	Play_Note(key_A5, tone_p1a, tone_p1b, #4)	;A5
+	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
+	Play_Note(key_A5, tone_p5a, tone_p5b, #4)	;E5
+	
+	Play_Note(key_A5, tone_ma6a, tone_ma6b,#4)	;F5
+	Play_Note(key_A5, tone_ma6a, tone_ma6b,#4)	;F5
+	Play_Note(key_A5, tone_p5a, tone_p5b, #8)	;E5
+	
+	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
+	Play_Note(key_A5, tone_p4a, tone_p4b, #4)	;D5
+	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
+	Play_Note(key_A5, tone_ma3a, tone_ma3b, #4)	;C5#
+	
+	Play_Note(key_A5, tone_ma2a, tone_ma2b, #4)	;B5
+	Play_Note(key_A5, tone_ma2a, tone_ma2b, #4)	;B5
+	Play_Note(key_A5, tone_p1a, tone_p1b, #8)	;A5
+	
+	
