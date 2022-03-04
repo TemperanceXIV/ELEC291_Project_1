@@ -65,13 +65,13 @@ Counter1: ds 2
 
 
 cseg
-;                      1234567890123456    <- This helps determine the location of the counter
-Initial_Message1:  db 'Period A:       ', 0
-Initial_Message2:  db 'Period B:       ', 0
-EndMessage1: db 'Player 1 Wins!', 0
-EndMessage2: db 'Player 2 Wins!', 0
-BlankSpace: db '00', 0
-BlankROw: db '0000000000000000'
+;                      	1234567890123456    <- This helps determine the location of the counter
+Initial_Message1:  	db 'Period A:       ', 0
+Initial_Message2:  	db 'Period B:       ', 0
+EndMessage1: 		db 'Player 1 Wins!', 0
+EndMessage2: 		db 'Player 2 Wins!', 0
+BlankSpace: 		db '00', 0
+BlankROw: 			db '0000000000000000'
 
 
 
